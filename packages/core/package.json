@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "web components micro builder",
   "main": "bin/index.js",
-  "keywords": ["build", "web component", "custom element"],
+  "keywords": [
+    "build",
+    "web component",
+    "custom element"
+  ],
   "author": "janouma",
   "license": "ISC",
   "type": "module",
@@ -14,20 +18,23 @@
     "node": "20.x",
     "npm": "10.x"
   },
-  "files": ["bin", "lib", "!.DS_Store"],
+  "files": [
+    "bin",
+    "lib",
+    "!.DS_Store"
+  ],
   "bin": {
     "@bifrost/core": "bin/index.js"
   },
   "scripts": {
-    "prepare": "husky",
     "lint": "eslint --no-error-on-unmatched-pattern",
     "standalone-lint": "npm run lint -- '{tests/**/*,lib/**/*,scripts/**/*,bin/**/*}.{js,cjs,mjs}'",
-    "test": "echo 'no tests yet'"
+    "test": "echo 'no tests yet'",
+    "lint-staged": "npx lint-staged"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
-    "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "standard": "^17.1.0"
   },

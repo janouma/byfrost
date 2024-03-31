@@ -1,0 +1,35 @@
+{
+  "name": "@bifrost/utils",
+  "version": "1.0.0",
+  "description": "utilities for @bifrost/core",
+  "main": "index.js",
+  "devDependencies": {
+    "@japa/expect": "^3.0.2",
+    "@japa/runner": "^3.1.2",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "lint-staged": "^15.2.2",
+    "standard": "^17.1.0",
+    "testdouble": "^3.20.2"
+  },
+  "scripts": {
+    "lint": "eslint --no-error-on-unmatched-pattern",
+    "standalone-lint": "npm run lint -- '{*,tests/**/*}.{js,cjs,mjs}'",
+    "test": "node bin/test.js",
+    "lint-staged": "npx lint-staged"
+  },
+  "author": "janouma",
+  "license": "ISC",
+  "type": "module",
+  "volta": {
+    "extends": "../../package.json"
+  },
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
+  "files": [
+    "*.js",
+    "tests/helpers"
+  ]
+}

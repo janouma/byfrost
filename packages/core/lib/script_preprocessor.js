@@ -6,10 +6,10 @@ import {
 
 import { mkdirSync } from 'fs'
 import { spawnSync } from 'child_process'
-import { curry } from '@bifrost/function'
-import { createOffsettedSplice } from '@bifrost/string'
-import { rewriteModulesImports } from './imports_rewriter'
-import compile from './compiler'
+import { curry } from '@bifrost/utils/function.js'
+import { createOffsettedSplice } from '@bifrost/utils/string.js'
+import { rewriteModulesImports } from './imports_rewriter.js'
+import compile from './compiler.js'
 
 import {
   COMPONENT_TYPE,
@@ -17,7 +17,7 @@ import {
   ASSET_TYPE,
   componentUri,
   extractImports
-} from './imports_parser'
+} from './imports_parser.js'
 
 const require = createRequire(import.meta.url)
 const leadingDotSlash = /^\.\//

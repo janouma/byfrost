@@ -2,8 +2,8 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 
 import { join, basename, extname } from 'path'
 import { spawnSync } from 'child_process'
 import { minify } from 'terser'
-import scriptPreprocessor from './script_preprocessor'
-import { rewriteModulesImports, resolveRelativeImports } from './imports_rewriter'
+import scriptPreprocessor from './script_preprocessor.js'
+import { rewriteModulesImports, resolveRelativeImports } from './imports_rewriter.js'
 
 export default async function compileComponent (
   {

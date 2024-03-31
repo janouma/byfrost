@@ -2,9 +2,9 @@ import { createRequire } from 'module'
 import { spawnSync } from 'child_process'
 import { mkdirSync, existsSync } from 'fs'
 import { join, dirname, basename, relative as relativize, resolve as resolvePath } from 'path'
-import logger from '@bifrost/logger'
-import { escapeRegExp, createOffsettedSplice } from '@bifrost/string'
-import { extractImports, COMPONENT_TYPE } from './imports_parser'
+import logger from '@bifrost/utils/logger.js'
+import { escapeRegExp, createOffsettedSplice } from '@bifrost/utils/string.js'
+import { extractImports, COMPONENT_TYPE } from './imports_parser.js'
 
 const require = createRequire(import.meta.url)
 const log = logger.getLogger('utils/imports_rewriter')

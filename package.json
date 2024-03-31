@@ -5,14 +5,20 @@
     "node": "20.12.0",
     "npm": "10.5.0"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "devDependencies": {
+    "@japa/expect": "^3.0.2",
+    "@japa/runner": "^3.1.2",
+    "create-japa": "^2.1.0",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
-    "standard": "^17.1.0"
+    "standard": "^17.1.0",
+    "testdouble": "^3.20.2"
+  },
+
+  "scripts": {
+    "prepare": "husky"
   }
 }

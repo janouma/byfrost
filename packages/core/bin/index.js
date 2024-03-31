@@ -2,7 +2,7 @@
 
 import { createRequire } from 'module'
 import { dirname } from 'path'
-import compileComponent from '../lib/compiler'
+import compileComponent from '../lib/compiler.js'
 
 const require = createRequire(import.meta.url)
 
