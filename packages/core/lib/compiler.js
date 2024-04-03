@@ -28,10 +28,6 @@ export default async function compileComponent (
     throw new Error('destination file must be provided')
   }
 
-  if (config && !configWorkingDirectory) {
-    throw new Error('configWorkingDirectory path must be provided alongside config')
-  }
-
   const componentName = basename(source)
   const componentFiles = readdirSync(source, { withFileTypes: true })
 
@@ -52,7 +48,7 @@ export default async function compileComponent (
     ...config?.srcTypesCompilerMapping
   }
 
-  const compile = await import(srcTypesCompilerMapping[sourceType])
+  const { default: compile } = await import(srcTypesCompilerMapping[sourceType])
   const componentDestFolder = join(destination, componentName)
 
   if (!existsSync(componentDestFolder)) {
@@ -63,7 +59,7 @@ export default async function compileComponent (
     copySources(source, componentDestFolder, target)
   }
 
-  const stylePreprocessor = config?.stylePreprocessor && await import(config?.stylePreprocessor)
+  const stylePreprocessor = config?.stylePreprocessor && (await import(config.stylePreprocessor)).default
   const sourceCode = String(readFileSync(filename))
 
   let compiledJs
@@ -71,13 +67,19 @@ export default async function compileComponent (
 
   ({ code: compiledJs, map: compiledSourceMap } = await compile({
     code: sourceCode,
+    enableSourcemap,
 
     scriptPreprocessor: scriptPreprocessor({
       source,
       destination,
       prefix,
       enableSourcemap,
-      config,
+
+      config: {
+        ...config,
+        srcTypesCompilerMapping
+      },
+
       configWorkingDirectory,
       moduleResolutionPaths
     }),

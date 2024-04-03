@@ -49,7 +49,7 @@ async function compile () {
     console.warn(configPath + ' config file not found')
   }
 
-  const config = await import(absoluteConfigPath)
+  const { default: config } = await import(absoluteConfigPath)
 
   return compileComponent({
     source,

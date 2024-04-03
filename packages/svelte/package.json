@@ -1,0 +1,41 @@
+{
+  "name": "@bifrost/svelte",
+  "version": "1.0.0",
+  "description": "svelte adapter for @bifrost/core compiler",
+  "main": "index.js",
+  "devDependencies": {
+    "@bifrost/utils": "^1.0.0",
+    "@japa/expect": "^3.0.2",
+    "@japa/runner": "^3.1.2",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "lint-staged": "^15.2.2",
+    "standard": "^17.1.0",
+    "svelte": "^4.2.12"
+  },
+  "scripts": {
+    "lint": "eslint --no-error-on-unmatched-pattern",
+    "standalone-lint": "npm run lint -- '{*,tests/**/*}.{js,cjs,mjs}'",
+    "test": "node bin/test.js",
+    "lint-staged": "npx lint-staged"
+  },
+  "keywords": [
+    "svelte"
+  ],
+  "author": "janouma",
+  "license": "ISC",
+  "peerDependencies": {
+    "svelte": "^4.2.12"
+  },
+  "type": "module",
+  "volta": {
+    "extends": "../../package.json"
+  },
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
+  "files": [
+    "*.js"
+  ]
+}

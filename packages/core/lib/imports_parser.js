@@ -1,13 +1,13 @@
+import { extname } from 'path'
 import { parse } from 'acorn'
 
 export const COMPONENT_TYPE = 'component'
 export const DEPENDENCY_TYPE = 'dependency'
 export const ASSET_TYPE = 'asset'
-export const componentUri = /^(.*?\/)*(.+?)\/(.+?)\.svelte$/
 export const dependencyUri = /^\.(.*?\/)+([^.]+?)(\.js)?$/
 export const assetUri = /^\.\/assets\/.+/
 
-export function extractImports (code) {
+export function extractImports (code, { sourceTypes = [] } = {}) {
   let body
 
   try {
@@ -21,13 +21,15 @@ export function extractImports (code) {
     throw error
   }
 
+  const componentUriPatterns = sourceTypes.map(getComponentUriPattern)
+
   return body.filter(({ type }) => type === 'ImportDeclaration').map(({
     source: { value: target }, start, end, specifiers
   }) => {
     const defaultSpecifier = specifiers.find(({ type }) => type === 'ImportDefaultSpecifier')
 
     return {
-      type: target.match(componentUri)
+      type: componentUriPatterns.some(pattern => target.match(pattern))
         ? COMPONENT_TYPE
         : target.match(assetUri)
           ? ASSET_TYPE
@@ -35,6 +37,7 @@ export function extractImports (code) {
             ? DEPENDENCY_TYPE
             : 'other',
 
+      sourceType: extname(target).replace(/^\./, ''),
       start,
       end,
       default: defaultSpecifier && defaultSpecifier.local.name,
@@ -42,6 +45,10 @@ export function extractImports (code) {
       target
     }
   })
+}
+
+export function getComponentUriPattern (sourceType) {
+  return new RegExp(`^(.*?/)*(.+?)/(.+?)\\.${sourceType}$`)
 }
 
 function getSample (code, line, column) {

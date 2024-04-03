@@ -15,7 +15,7 @@ import {
   COMPONENT_TYPE,
   DEPENDENCY_TYPE,
   ASSET_TYPE,
-  componentUri,
+  getComponentUriPattern,
   extractImports
 } from './imports_parser.js'
 
@@ -39,9 +39,10 @@ export default curry(async (
 ) => {
   const hostComponentName = basename(source)
   const hostComponentDestFolder = join(destination, hostComponentName)
+  const sourceTypes = Object.keys(config.srcTypesCompilerMapping)
   let transformedCode = code
 
-  const dependencyImports = extractImports(transformedCode).filter(({ type }) => type === DEPENDENCY_TYPE)
+  const dependencyImports = extractImports(transformedCode, { sourceTypes }).filter(({ type }) => type === DEPENDENCY_TYPE)
 
   {
     const splice = createOffsettedSplice()
@@ -98,13 +99,14 @@ export default curry(async (
     })
   }
 
-  const componentImports = extractImports(transformedCode).filter(({ type }) => type === COMPONENT_TYPE)
+  const componentImports = extractImports(transformedCode, { sourceTypes })
+    .filter(({ type }) => type === COMPONENT_TYPE)
 
   {
     const splice = createOffsettedSplice()
 
-    for (const { target, start, end } of componentImports) {
-      const [component, file] = Array.from(target.match(componentUri)).slice(-2)
+    for (const { target, sourceType, start, end } of componentImports) {
+      const [component, file] = Array.from(target.match(getComponentUriPattern(sourceType))).slice(-2)
       const dependencyPath = resolveModule(target, { paths: [source] })
       const dependencySourceFolder = dirname(dependencyPath)
       const componentDestFolder = join(destination, component)
