@@ -7,13 +7,13 @@ import compile from '../../index.js'
 const require = createRequire(import.meta.url)
 const filename = require.resolve('../fixtures/the_best_component.svelte')
 const code = String(readFileSync(filename))
-const expectedCompiled = String(readFileSync(require.resolve('../fixtures/the_best_component.js.out')))
+const expectedCompiled = String(readFileSync(require.resolve('../expectations/the_best_component.js')))
 
 const expectedCompiledWithCss = String(
-  readFileSync(require.resolve('../fixtures/the_best_component.precss.js.out'))
+  readFileSync(require.resolve('../expectations/the_best_component.precss.js'))
 )
 
-const expectedSourcemap = String(readFileSync(require.resolve('../fixtures/the_best_component.js.map')))
+const expectedSourcemap = String(readFileSync(require.resolve('../expectations/the_best_component.js.map')))
 
 function minify (string) {
   return string.trim().replace(/\s+/gs, ' ').replace(/(\W)\s+/gs, '$1')
@@ -90,4 +90,30 @@ test('should generate sourcemap', async ({ expect }) => {
   })
 
   expect(minify(JSON.stringify(sourcemap))).toBe(minify(expectedSourcemap))
+})
+
+test('should handle unknown error', async ({ expect }) => {
+  const sourceFile = require.resolve('../fixtures/options_error_component.svelte')
+  const sourceCode = String(readFileSync(sourceFile))
+
+  return expect(
+    compile({ code: sourceCode, scriptPreprocessor, filename: sourceFile })
+  ).rejects.toThrow("<svelte:options> unknown attribute 'unkownOption'")
+})
+
+test('should handle syntax error', async ({ expect }) => {
+  const sourceFile = require.resolve('../fixtures/syntax_error_component.svelte')
+  const sourceCode = String(readFileSync(sourceFile))
+
+  const { message } = await compile({ code: sourceCode, scriptPreprocessor, filename: sourceFile })
+    .catch(error => error)
+
+  expect(message.trim()).toBe(`parse-error — Unexpected token
+in file /Users/Shared/work/bifrost/packages/svelte/tests/fixtures/syntax_error_component.svelte
+14: <script>
+15: export let name = 'Ze Component'
+16: name =;
+          ^
+17: </script>
+18:`)
 })

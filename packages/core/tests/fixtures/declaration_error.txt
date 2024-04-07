@@ -1,0 +1,9 @@
+Unexpected token (2:10)
+  1 │ 
+▶ 2 │     const '//'; import 'joi'
+                ▲
+  3 │     /*
+  4 │     import fuse from 'fuse.js'
+  5 │     */
+  6 │     import { onMount } from 'svelte'
+  7 │     // import { tick } from 'svelte'

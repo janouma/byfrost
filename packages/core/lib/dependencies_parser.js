@@ -2,12 +2,12 @@ import { extname } from 'path'
 import { parse } from 'acorn'
 
 export const COMPONENT_TYPE = 'component'
-export const DEPENDENCY_TYPE = 'dependency'
+export const PLAIN_JS_TYPE = 'plainJs'
 export const ASSET_TYPE = 'asset'
-export const dependencyUri = /^\.(.*?\/)+([^.]+?)(\.js)?$/
+export const plainJsUri = /^\.(.*?\/)+([^.]+?)(\.js)?$/
 export const assetUri = /^\.\/assets\/.+/
 
-export function extractImports (code, { sourceTypes = [] } = {}) {
+export function extractDependencies (code, { sourceTypes = [], includeExports = false } = {}) {
   let body
 
   try {
@@ -23,26 +23,31 @@ export function extractImports (code, { sourceTypes = [] } = {}) {
 
   const componentUriPatterns = sourceTypes.map(getComponentUriPattern)
 
-  return body.filter(({ type }) => type === 'ImportDeclaration').map(({
-    source: { value: target }, start, end, specifiers
+  return body.filter(
+    ({ type, source }) =>
+      type === 'ImportDeclaration' ||
+      (includeExports && type.match(exportDeclaration) && source)
+  ).map(({
+    source: { value: target, start: targetStart, end: targetEnd }, start, end, specifiers
   }) => {
-    const defaultSpecifier = specifiers.find(({ type }) => type === 'ImportDefaultSpecifier')
+    const defaultSpecifier = specifiers?.find(({ type }) => type === 'ImportDefaultSpecifier')
 
     return {
       type: componentUriPatterns.some(pattern => target.match(pattern))
         ? COMPONENT_TYPE
         : target.match(assetUri)
           ? ASSET_TYPE
-          : target.match(dependencyUri)
-            ? DEPENDENCY_TYPE
+          : target.match(plainJsUri)
+            ? PLAIN_JS_TYPE
             : 'other',
 
-      sourceType: extname(target).replace(/^\./, ''),
+      sourceType: extname(target).replace(/^\./, '') || undefined,
       start,
       end,
       default: defaultSpecifier && defaultSpecifier.local.name,
-      variables: specifiers.map(({ local: { name } }) => name),
-      target
+      variables: specifiers?.map(({ local: { name } }) => name),
+      target,
+      targetBounds: { start: targetStart, end: targetEnd }
     }
   })
 }
@@ -50,6 +55,8 @@ export function extractImports (code, { sourceTypes = [] } = {}) {
 export function getComponentUriPattern (sourceType) {
   return new RegExp(`^(.*?/)*(.+?)/(.+?)\\.${sourceType}$`)
 }
+
+const exportDeclaration = /^Export\w+Declaration$/
 
 function getSample (code, line, column) {
   const windowHeight = 5

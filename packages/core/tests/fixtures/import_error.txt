@@ -1,0 +1,13 @@
+Unexpected token (12:6)
+  07 │     // import { tick } from 'svelte'
+  08 │ 
+  09 │     import {
+  10 │       process,
+  11 │       amend
+▶ 12 │     } '^/lib/core'
+             ▲
+  13 │ 
+  14 │     import './ubutton/*index.js'
+  15 │     import fuse from 'fuse.js'
+  16 │ //    import fuse from 'fuse.js'
+  17 │     /*import fuse from 'fuse.js'*/

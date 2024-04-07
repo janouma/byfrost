@@ -37,9 +37,11 @@
     "@japa/runner": "^3.1.2",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
+    "joi": "^17.12.3",
     "lint-staged": "^15.2.2",
     "standard": "^17.1.0",
-    "svelte": "^4.2.12"
+    "svelte": "^4.2.12",
+    "testdouble": "^3.20.2"
   },
   "dependencies": {
     "@bifrost/utils": "^1.0.0",

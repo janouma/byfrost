@@ -1,0 +1,8 @@
+Unexpected keyword 'export' (22:6)
+  17 │     /*import fuse from 'fuse.js'*/
+  18 │     import widget from '@heimdall/shared/widget/index.svelte'
+  19 │ 
+  20 │     const
+  21 │ 
+▶ 22 │       export let title
+             ▲

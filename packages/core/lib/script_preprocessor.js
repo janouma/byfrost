@@ -4,20 +4,18 @@ import {
   join, basename, dirname, relative as relativize, resolve as resolvePath, sep as pathSeparator
 } from 'path'
 
-import { mkdirSync } from 'fs'
-import { spawnSync } from 'child_process'
 import { curry } from '@bifrost/utils/function.js'
 import { createOffsettedSplice } from '@bifrost/utils/string.js'
-import { rewriteModulesImports } from './imports_rewriter.js'
+import { rewriteModulesImports, copyWithDependencies } from './imports_rewriter.js'
 import compile from './compiler.js'
 
 import {
   COMPONENT_TYPE,
-  DEPENDENCY_TYPE,
+  PLAIN_JS_TYPE,
   ASSET_TYPE,
   getComponentUriPattern,
-  extractImports
-} from './imports_parser.js'
+  extractDependencies
+} from './dependencies_parser.js'
 
 const require = createRequire(import.meta.url)
 const leadingDotSlash = /^\.\//
@@ -42,12 +40,12 @@ export default curry(async (
   const sourceTypes = Object.keys(config.srcTypesCompilerMapping)
   let transformedCode = code
 
-  const dependencyImports = extractImports(transformedCode, { sourceTypes }).filter(({ type }) => type === DEPENDENCY_TYPE)
+  const dependencyImports = extractDependencies(transformedCode, { sourceTypes }).filter(({ type }) => type === PLAIN_JS_TYPE)
 
   {
     const splice = createOffsettedSplice()
 
-    for (const { start, end, default: defaultImport, variables, target } of dependencyImports) {
+    for (const { target, targetBounds: { start, end } } of dependencyImports) {
       const dependencySourcePath = resolveModule(target, { paths: [source] })
       const depInitialDestPath = resolvePath(hostComponentDestFolder, target)
 
@@ -57,31 +55,11 @@ export default curry(async (
       const depFinalDestPath = join(destination, depRelativeDestPath)
         .replace(/\.js$/, '') + '.js'
 
-      mkdirSync(dirname(depFinalDestPath), { recursive: true })
-      spawnSync('cp', [dependencySourcePath, depFinalDestPath])
+      copyWithDependencies({ src: dependencySourcePath, copy: depFinalDestPath, base: destination })
 
       const updatedImportPath = relativize(hostComponentDestFolder, depFinalDestPath)
       const leadingDot = updatedImportPath.startsWith('.') ? '' : './'
-      const variablesStatements = []
-
-      if (defaultImport) {
-        variablesStatements.push(defaultImport)
-      }
-
-      const namedImports = variables.filter(name => name !== defaultImport)
-
-      if (namedImports.length > 0) {
-        variablesStatements.push(`{${namedImports.join(',')}}`)
-      }
-
-      const from = variables.length > 0 ? ' from ' : ''
-
-      transformedCode = splice(
-        transformedCode,
-        `import ${variablesStatements.join(',')}${from}'${leadingDot}${updatedImportPath}'`,
-        start,
-        end
-      )
+      transformedCode = splice(transformedCode, `'${leadingDot}${updatedImportPath}'`, start, end)
     }
   }
 
@@ -99,7 +77,7 @@ export default curry(async (
     })
   }
 
-  const componentImports = extractImports(transformedCode, { sourceTypes })
+  const componentImports = extractDependencies(transformedCode, { sourceTypes })
     .filter(({ type }) => type === COMPONENT_TYPE)
 
   {
@@ -131,7 +109,7 @@ export default curry(async (
     }
   }
 
-  const assetImports = extractImports(transformedCode).filter(({ type }) => type === ASSET_TYPE)
+  const assetImports = extractDependencies(transformedCode).filter(({ type }) => type === ASSET_TYPE)
   const componentRelativePath = prefix ? join(prefix, hostComponentName) : hostComponentName
 
   {

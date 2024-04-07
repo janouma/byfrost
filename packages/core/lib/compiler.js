@@ -1,9 +1,12 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs'
 import { join, basename, extname } from 'path'
+import logger from '@bifrost/utils/logger.js'
 import { spawnSync } from 'child_process'
 import { minify } from 'terser'
 import scriptPreprocessor from './script_preprocessor.js'
 import { rewriteModulesImports, resolveRelativeImports } from './imports_rewriter.js'
+
+const log = logger.getLogger('core/compiler')
 
 export default async function compileComponent (
   {
@@ -26,6 +29,18 @@ export default async function compileComponent (
 
   if (!destination) {
     throw new Error('destination file must be provided')
+  }
+
+  if (config?.modulesMapping && !configWorkingDirectory) {
+    throw new Error('configWorkingDirectory path must be provided alongside config.modulesMapping')
+  }
+
+  if (config?.stylePreprocessor && typeof config.stylePreprocessor !== 'function') {
+    throw new Error('config.stylePreprocessor must be a function')
+  }
+
+  if (prefix && !config?.stylePreprocessor) {
+    log.warn(`prefix (${prefix}) is useless without stylePreprocessor`)
   }
 
   const componentName = basename(source)
@@ -59,7 +74,6 @@ export default async function compileComponent (
     copySources(source, componentDestFolder, target)
   }
 
-  const stylePreprocessor = config?.stylePreprocessor && (await import(config.stylePreprocessor)).default
   const sourceCode = String(readFileSync(filename))
 
   let compiledJs
@@ -84,7 +98,7 @@ export default async function compileComponent (
       moduleResolutionPaths
     }),
 
-    stylePreprocessor: stylePreprocessor?.({ dest: (prefix ? prefix + '/' : '') + componentName }),
+    stylePreprocessor: config?.stylePreprocessor?.({ dest: (prefix ? prefix + '/' : '') + componentName }),
     filename
   }))
 

@@ -67,12 +67,18 @@ export default async function compileComponent (
       }
     ))
   } catch (error) {
-    throw error.name === 'ParseError'
-      ? new Error(`${error.code} — ${error.message}
-in file ${error.filename}
+    let refinedError
+
+    if (error.name === 'ParseError') {
+      refinedError = new Error(`${error.code} — ${error.message}\nin file ${error.filename}
 ${error.frame}
       `)
-      : error
+      refinedError.name = error.name
+    } else {
+      refinedError = error
+    }
+
+    throw refinedError
   }
 
   return { code: compiledJs, map: compiledSourceMap }

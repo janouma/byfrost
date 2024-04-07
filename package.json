@@ -19,6 +19,8 @@
   },
 
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint-staged": "npm run lint-staged --workspaces",
+    "test": "npm test --workspaces"
   }
 }

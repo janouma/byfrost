@@ -1,20 +1,28 @@
 import { createRequire } from 'module'
-import { spawnSync } from 'child_process'
-import { mkdirSync, existsSync } from 'fs'
-import { join, dirname, basename, relative as relativize, resolve as resolvePath } from 'path'
+import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs'
+
+import {
+  join,
+  dirname,
+  basename,
+  relative as relativize,
+  resolve as resolvePath,
+  normalize
+} from 'path'
+
 import logger from '@bifrost/utils/logger.js'
 import { escapeRegExp, createOffsettedSplice } from '@bifrost/utils/string.js'
-import { extractImports, COMPONENT_TYPE } from './imports_parser.js'
+import { extractDependencies, COMPONENT_TYPE, PLAIN_JS_TYPE } from './dependencies_parser.js'
 
 const require = createRequire(import.meta.url)
-const log = logger.getLogger('utils/imports_rewriter')
+const log = logger.getLogger('core/imports_rewriter')
 
 export function rewriteModulesImports ({
   code, modulesMapping, copyModules: copyAllModules, source, destination, moduleResolutionPaths,
   configWorkingDirectory, resolveModule = require.resolve
 }) {
   const splice = createOffsettedSplice()
-  const imports = extractImports(code)
+  const imports = extractDependencies(code)
 
   const parsedModuleMapping = Object.entries(modulesMapping).map(([target, config]) =>
     target.startsWith('/^') && target.endsWith('$/')
@@ -40,11 +48,13 @@ export function rewriteModulesImports ({
 
       log.debug({ target, config })
 
-      const { alias, configAlias, moduleDestination, configModuleDest, copyModule } = parseConfig({
+      const { alias, configAlias, moduleDestination, moduleDestAbsolutePath, copyModule } = parseConfig({
         srcTarget, target, config, componentDestFolder, configWorkingDirectory, copyAllModules
       })
 
-      log.debug({ alias, configAlias, moduleDestination, configModuleDest, copyModule, copyAllModules })
+      log.debug(
+        { alias, configAlias, moduleDestination, moduleDestAbsolutePath, copyModule, copyAllModules }
+      )
 
       const statement = code.substring(start, end)
       const targetLitteral = new RegExp(`("|')${escapeRegExp(srcTarget)}\\1`)
@@ -58,25 +68,16 @@ export function rewriteModulesImports ({
       transformedCode = splice(transformedCode, rewrittenImport, start, end)
 
       if (copyModule) {
-        const aliasDestFolder = dirname(configModuleDest)
-
-        log.debug('aliasDestFolder:', aliasDestFolder)
-
-        if (!existsSync(aliasDestFolder)) {
-          mkdirSync(aliasDestFolder, { recursive: true })
-        }
-
         const aliasSrcPath = tryResolvingModule(
-          resolveModule, configAlias, { paths: moduleResolutionPaths }
+          resolveModule, configAlias, {
+            paths: configWorkingDirectory
+              ? [...moduleResolutionPaths, configWorkingDirectory]
+              : moduleResolutionPaths
+          }
         )
 
         log.debug('aliasSrcPath:', aliasSrcPath)
-
-        const { error, status, stderr } = spawnSync('cp', [aliasSrcPath, configModuleDest])
-
-        if (error || status) {
-          throw new Error(stderr)
-        }
+        copyWithDependencies({ src: aliasSrcPath, copy: moduleDestAbsolutePath })
       }
     }
   }
@@ -134,13 +135,19 @@ function parseConfig ({
     copyModule = copyAllModules
   }
 
-  return { alias, configAlias, moduleDestination, configModuleDest, copyModule }
+  return {
+    alias,
+    configAlias,
+    moduleDestination,
+    copyModule,
+    ...(copyModule && { moduleDestAbsolutePath: resolvePath(configWorkingDirectory, configModuleDest) })
+  }
 }
 
 function relativizeMapping (componentDestFolder, mapping, configWorkingDirectory) {
   if (mapping.startsWith('./') || mapping.startsWith('../')) {
     log.debug(
-      `resolvePath('${configWorkingDirectory}', '${mapping}'):`,
+      `resolvePath(configWorkingDirectory:'${configWorkingDirectory}', mapping:'${mapping}'):`,
       resolvePath(configWorkingDirectory, mapping)
     )
 
@@ -152,6 +159,8 @@ function relativizeMapping (componentDestFolder, mapping, configWorkingDirectory
 
 function tryResolvingModule (resolve, target, ...options) {
   let targetSrcPath
+
+  log.debug({ target, 'options[0].paths': options[0]?.paths })
 
   try {
     targetSrcPath = resolve(target, ...options)
@@ -178,14 +187,67 @@ function tryResolvingModule (resolve, target, ...options) {
     }
   }
 
+  log.debug({ targetSrcPath })
+
   return targetSrcPath
+}
+
+export function copyWithDependencies ({ src: source, copy: destination, base = dirname(destination) }) {
+  log.debug('copyWithDependencies:', { source, destination })
+
+  const code = readFileSync(source)
+  let transformedCode = code
+
+  const dependencies = extractDependencies(
+    String(code), { includeExports: true }
+  )
+
+  const jsDependencies = dependencies.filter(
+    ({ target, type }) =>
+      (target.startsWith('./') || target.startsWith('../')) &&
+      type === PLAIN_JS_TYPE
+  )
+
+  if (log.logLevel === 'debug') {
+    log.debug('copyWithDependencies:', { dependencies, jsDependencies })
+  }
+
+  const splice = createOffsettedSplice()
+
+  for (const { target, targetBounds: { start, end } } of jsDependencies) {
+    const targetAbsolutePath = resolvePath(dirname(source), target)
+
+    const targetOriginalDestPath = resolvePath(dirname(destination), target)
+    const targetRelativeDestPath = relativize(base, targetOriginalDestPath)
+    const targetDestinationPath = `${base}/${targetRelativeDestPath}`.replaceAll('../', '--/')
+
+    const containedTarget = normalize(relativize(dirname(destination), targetDestinationPath))
+      .replace(/^(?!\.\.?\/)/, './')
+
+    const targetDestinationFolderPath = dirname(targetDestinationPath)
+
+    if (!existsSync(targetDestinationFolderPath)) {
+      mkdirSync(targetDestinationFolderPath, { recursive: true })
+    }
+
+    transformedCode = splice(transformedCode, `'${containedTarget}'`, start, end)
+    copyWithDependencies({ src: targetAbsolutePath, copy: targetDestinationPath, base })
+  }
+
+  const destinationFolder = dirname(destination)
+
+  if (!existsSync(destinationFolder)) {
+    mkdirSync(destinationFolder, { recursive: true })
+  }
+
+  writeFileSync(destination, transformedCode)
 }
 
 export function resolveRelativeImports ({
   code, source, destination, moduleResolutionPaths, resolveModule = require.resolve
 }) {
   const componentDestFolder = join(destination, basename(source))
-  const imports = extractImports(code)
+  const imports = extractDependencies(code)
     .filter(({ target }) => target.startsWith('./') || target.startsWith('../'))
 
   const splice = createOffsettedSplice()
