@@ -111,6 +111,7 @@ export default async function compileComponent (
       copyModules,
       configWorkingDirectory,
       source,
+      sourceTypes: Object.keys(srcTypesCompilerMapping),
       destination,
       moduleResolutionPaths
     })

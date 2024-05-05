@@ -73,6 +73,7 @@ export default curry(async (
       copyModules,
       configWorkingDirectory,
       source,
+      sourceTypes,
       destination,
       moduleResolutionPaths
     })

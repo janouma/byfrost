@@ -18,11 +18,11 @@ const require = createRequire(import.meta.url)
 const log = logger.getLogger('core/imports_rewriter')
 
 export function rewriteModulesImports ({
-  code, modulesMapping, copyModules: copyAllModules, source, destination, moduleResolutionPaths,
+  code, modulesMapping, copyModules: copyAllModules, source, sourceTypes, destination, moduleResolutionPaths,
   configWorkingDirectory, resolveModule = require.resolve
 }) {
   const splice = createOffsettedSplice()
-  const imports = extractDependencies(code)
+  const imports = extractDependencies(code, { sourceTypes })
 
   const parsedModuleMapping = Object.entries(modulesMapping).map(([target, config]) =>
     target.startsWith('/^') && target.endsWith('$/')
@@ -59,7 +59,8 @@ export function rewriteModulesImports ({
       const statement = code.substring(start, end)
       const targetLitteral = new RegExp(`("|')${escapeRegExp(srcTarget)}\\1`)
 
-      const componentMark = type === COMPONENT_TYPE && !moduleDestination.endsWith('.svelte')
+      const componentMark = type === COMPONENT_TYPE &&
+        !sourceTypes.some(sourceType => moduleDestination.endsWith('.' + sourceType))
         ? 'component:'
         : ''
 

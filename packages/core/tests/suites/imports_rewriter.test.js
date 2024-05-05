@@ -65,6 +65,7 @@ test.group('#rewriteModulesImports', group => {
       modulesMapping,
       destination,
       source,
+      sourceTypes: ['svelte'],
       configWorkingDirectory
     })
 
@@ -90,7 +91,7 @@ test.group('#rewriteModulesImports', group => {
     import widget from '@heimdall/shared/lib/widget/index.svelte'
     import menu from '@heimdall/shared/lib/menu/index.svelte'
     import canvas from '../../shared-components/@heimdall/shared/canvas/index.js'
-    import icon from '../../fixtures/icons/bullet.js'
+    import icon from 'component:../../fixtures/icons/bullet.js'
 
     export let title`
     )
@@ -159,6 +160,7 @@ test.group('#rewriteModulesImports', group => {
       modulesMapping,
       destination,
       source,
+      sourceTypes: ['svelte'],
       configWorkingDirectory,
       moduleResolutionPaths,
       copyModules: true
