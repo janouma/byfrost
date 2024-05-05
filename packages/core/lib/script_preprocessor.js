@@ -17,6 +17,7 @@ import {
   extractDependencies
 } from './dependencies_parser.js'
 
+const cache = new Map()
 const require = createRequire(import.meta.url)
 const leadingDotSlash = /^\.\//
 
@@ -30,7 +31,7 @@ export default curry(async (
     moduleResolutionPaths,
     configWorkingDirectory,
 
-    // only for test purpose, since it is not possible to mock require.resolve at this moment
+    // only for test purpose
     resolveModule = require.resolve
   },
   { content: code }
@@ -86,25 +87,34 @@ export default curry(async (
     for (const { target, sourceType, start, end } of componentImports) {
       const [component, file] = Array.from(target.match(getComponentUriPattern(sourceType))).slice(-2)
       const dependencyPath = resolveModule(target, { paths: [source] })
-      const dependencySourceFolder = dirname(dependencyPath)
-      const componentDestFolder = join(destination, component)
-      const destImportTarget = join(relativize(hostComponentDestFolder, componentDestFolder), `${file}.js`)
+      let targetDestinationPath
 
-      await compile({
-        source: dependencySourceFolder,
-        destination,
-        prefix,
-        enableSourcemap,
-        config,
-        configWorkingDirectory,
+      if (cache.has(dependencyPath)) {
+        targetDestinationPath = cache.get(dependencyPath)
+      } else {
+        const dependencySourceFolder = dirname(dependencyPath)
+        const componentDestFolder = join(destination, component)
 
-        moduleResolutionPaths: [
-          dependencySourceFolder,
-          join(destination, hostComponentName),
-          source
-        ]
-      })
+        targetDestinationPath = join(componentDestFolder, `${file}.js`)
+        cache.set(dependencyPath, targetDestinationPath)
 
+        await compile({
+          source: dependencySourceFolder,
+          destination,
+          prefix,
+          enableSourcemap,
+          config,
+          configWorkingDirectory,
+
+          moduleResolutionPaths: [
+            dependencySourceFolder,
+            join(destination, hostComponentName),
+            source
+          ]
+        })
+      }
+
+      const destImportTarget = relativize(hostComponentDestFolder, targetDestinationPath)
       transformedCode = splice(transformedCode, `import 'component:${destImportTarget}'`, start, end)
     }
   }
@@ -127,3 +137,8 @@ export default curry(async (
 
   return { code: transformedCode }
 })
+
+// only for test purpose
+export function clearCache () {
+  cache.clear()
+}

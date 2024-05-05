@@ -2,7 +2,7 @@
   immutable={true}
 
   customElement={{
-    tag: 'the-best-component',
+    tag: 'simple-component',
     shadow: 'none'
   }}
 />
@@ -12,8 +12,7 @@
 </style>
 
 <script>
-import '../the_main_component/index.svelte'
 export let name
 </script>
 
-<h1>The best Svelte component "{name}" in the world</h1>
+<h1>Simple Svelte component "{name}" in the world</h1>

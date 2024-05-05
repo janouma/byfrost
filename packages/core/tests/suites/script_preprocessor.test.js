@@ -2,7 +2,7 @@ import { createRequire } from 'module'
 import { readFileSync, existsSync, mkdirSync, rmSync } from 'fs'
 import { dirname, resolve, basename } from 'path'
 import { test } from '@japa/runner'
-import createScriptPreprocessor from '../../lib/script_preprocessor.js'
+import createScriptPreprocessor, { clearCache } from '../../lib/script_preprocessor.js'
 
 const require = createRequire(import.meta.url)
 
@@ -20,6 +20,7 @@ test.group('script_preprocessor', group => {
     }
 
     mkdirSync(destination, { recursive: true })
+    clearCache()
   })
 
   test('should process dependencies recursively', async ({ expect }) => {
@@ -126,6 +127,4 @@ test.group('script_preprocessor', group => {
       expect(transformedCode).toBe("const icon = 'prefix/the_root_component/assets/images/icon.svg'")
     }
   })
-
-  test('should cache compiled dependencies', () => {}).skip(true, 'TODO')
 })

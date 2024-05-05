@@ -3,6 +3,7 @@ import { readFileSync, existsSync, mkdirSync, rmSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { test } from '@japa/runner'
 import * as td from 'testdouble'
+import { clearCache } from '../../lib/script_preprocessor.js'
 import compile from '../../lib/compiler.js'
 
 const require = createRequire(import.meta.url)
@@ -19,6 +20,7 @@ test.group('compiler', group => {
     }
 
     mkdirSync(destination, { recursive: true })
+    clearCache()
   })
 
   test('should compile component', async ({ expect }) => {
@@ -127,7 +129,7 @@ test.group('compiler', group => {
   })
 
   test('should handle moduleResolutionPaths argument', async ({ expect }) => {
-    const filename = require.resolve('../fixtures/the_best_component/index.svelte')
+    const filename = require.resolve('../fixtures/simple_component/index.svelte')
     const source = dirname(filename)
     const configPath = require.resolve('../fixtures/custom_ter.config.js')
     const configWorkingDirectory = dirname(configPath)
@@ -135,7 +137,7 @@ test.group('compiler', group => {
     const modulesPath = resolve(source, '../modules')
 
     const expectedCompiled = String(readFileSync(
-      require.resolve('../expectations/the_best_component.config_bis.js')
+      require.resolve('../expectations/simple_component.js')
     )).trim()
 
     await compile({
@@ -146,7 +148,7 @@ test.group('compiler', group => {
       moduleResolutionPaths: [modulesPath]
     })
 
-    const compiled = String(readFileSync(`${destination}/the_best_component/index.js`))
+    const compiled = String(readFileSync(`${destination}/simple_component/index.js`))
     expect(compiled).toBe(expectedCompiled)
   })
 
