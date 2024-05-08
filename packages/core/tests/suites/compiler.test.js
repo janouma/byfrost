@@ -3,7 +3,8 @@ import { readFileSync, existsSync, mkdirSync, rmSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { test } from '@japa/runner'
 import * as td from 'testdouble'
-import { clearCache } from '../../lib/script_preprocessor.js'
+import { clearCache as clearCompileCache } from '../../lib/script_preprocessor.js'
+import { clearCache as clearCopyCache } from '../../lib/imports_rewriter.js'
 import compile from '../../lib/compiler.js'
 
 const require = createRequire(import.meta.url)
@@ -20,7 +21,8 @@ test.group('compiler', group => {
     }
 
     mkdirSync(destination, { recursive: true })
-    clearCache()
+    clearCompileCache()
+    clearCopyCache()
   })
 
   test('should compile component', async ({ expect }) => {

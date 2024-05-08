@@ -2,7 +2,7 @@ import { createRequire } from 'module'
 import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, readdirSync } from 'fs'
 import { dirname, resolve, basename } from 'path'
 import { test } from '@japa/runner'
-import { rewriteModulesImports, resolveRelativeImports } from '../../lib/imports_rewriter.js'
+import { rewriteModulesImports, resolveRelativeImports, clearCache } from '../../lib/imports_rewriter.js'
 
 const require = createRequire(import.meta.url)
 
@@ -18,6 +18,7 @@ test.group('#rewriteModulesImports', group => {
     }
 
     mkdirSync(destination, { recursive: true })
+    clearCache()
   })
 
   test('should rewrite imports statement according to config mapping', ({ expect }) => {

@@ -17,9 +17,9 @@ import {
   extractDependencies
 } from './dependencies_parser.js'
 
-const cache = new Map()
 const require = createRequire(import.meta.url)
 const leadingDotSlash = /^\.\//
+const cache = new Map()
 
 export default curry(async (
   {

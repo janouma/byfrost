@@ -2,7 +2,11 @@ import { createRequire } from 'module'
 import { readFileSync, existsSync, mkdirSync, rmSync } from 'fs'
 import { dirname, resolve, basename } from 'path'
 import { test } from '@japa/runner'
-import createScriptPreprocessor, { clearCache } from '../../lib/script_preprocessor.js'
+
+import createScriptPreprocessor, { clearCache as clearCompileCache }
+  from '../../lib/script_preprocessor.js'
+
+import { clearCache as clearCopyCache } from '../../lib/imports_rewriter.js'
 
 const require = createRequire(import.meta.url)
 
@@ -20,7 +24,8 @@ test.group('script_preprocessor', group => {
     }
 
     mkdirSync(destination, { recursive: true })
-    clearCache()
+    clearCompileCache()
+    clearCopyCache()
   })
 
   test('should process dependencies recursively', async ({ expect }) => {

@@ -16,6 +16,7 @@ import { extractDependencies, COMPONENT_TYPE, PLAIN_JS_TYPE } from './dependenci
 
 const require = createRequire(import.meta.url)
 const log = logger.getLogger('core/imports_rewriter')
+const cache = new Map()
 
 export function rewriteModulesImports ({
   code, modulesMapping, copyModules: copyAllModules, source, sourceTypes, destination, moduleResolutionPaths,
@@ -196,6 +197,18 @@ function tryResolvingModule (resolve, target, ...options) {
 export function copyWithDependencies ({ src: source, copy: destination, base = dirname(destination) }) {
   log.debug('copyWithDependencies:', { source, destination })
 
+  const sourceCache = cache.get(source)
+
+  if (sourceCache?.has(destination)) {
+    return
+  } else {
+    if (sourceCache) {
+      sourceCache.add(destination)
+    } else {
+      cache.set(source, new Set([destination]))
+    }
+  }
+
   const code = readFileSync(source)
   let transformedCode = code
 
@@ -273,4 +286,9 @@ export function resolveRelativeImports ({
   }
 
   return transformedCode
+}
+
+// only for test purpose
+export function clearCache () {
+  cache.clear()
 }
