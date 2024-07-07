@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 
-import { createRequire } from 'module'
-import { dirname } from 'path'
+import { dirname, resolve } from 'path'
 import compileComponent from '../lib/compiler.js'
-
-const require = createRequire(import.meta.url)
 
 const [command] = process.argv.slice(2)
 
@@ -44,12 +41,12 @@ async function compile () {
   let absoluteConfigPath
 
   try {
-    absoluteConfigPath = require.resolve(configPath)
+    absoluteConfigPath = resolve(configPath)
   } catch (error) {
     console.warn(configPath + ' config file not found')
   }
 
-  const { default: config } = await import(absoluteConfigPath)
+  const { default: config } = absoluteConfigPath ? await import(absoluteConfigPath) : {}
 
   return compileComponent({
     source,
