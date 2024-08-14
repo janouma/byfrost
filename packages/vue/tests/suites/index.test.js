@@ -5,7 +5,7 @@ import { nextTick } from '@bifrost/utils/tests/helpers/async.js'
 import compile from '../../index.js'
 
 const require = createRequire(import.meta.url)
-const filename = require.resolve('../fixtures/the_best_component.vue')
+const filename = require.resolve('../fixtures/the_best_component/index.vue')
 const code = String(readFileSync(filename))
 const expectedCompiled = String(readFileSync(require.resolve('../expectations/the_best_component.js')))
 
@@ -62,14 +62,14 @@ test('should validate parameters', async ({ expect }) => {
   await expect(() => compile({
     code,
     scriptPreprocessor,
-    filename: 'path/to/mal-formed_component.vue'
+    filename: 'path/to/mal-formed_component/index.vue'
   })).rejects
     .toThrow(
       'filename must match custom element name pattern (my_awesome_component). Actual "mal-formed_component"'
     )
 
-  await expect(() => compile({ code, scriptPreprocessor, filename: 'unkown_file.vue' })).rejects
-    .toThrow('source file unkown_file.vue is missing')
+  await expect(() => compile({ code, scriptPreprocessor, filename: 'unkown_file/index.vue' })).rejects
+    .toThrow('source file unkown_file/index.vue is missing')
 
   await expect(() => compile({ code, scriptPreprocessor, filename, enableSourcemap: 'yes' })).rejects
     .toThrow('enableSourcemap has a wrong format (boolean | { [css/js]: boolean }). Actual "yes"')
@@ -118,7 +118,7 @@ test('should generate sourcemap', async ({ expect }) => {
 })
 
 test('should handle error', async ({ expect }) => {
-  const sourceFile = require.resolve('../fixtures/syntax_error_component.vue')
+  const sourceFile = require.resolve('../fixtures/syntax_error_component/index.vue')
   const sourceCode = String(readFileSync(sourceFile))
 
   const { message } = await compile({ code: sourceCode, scriptPreprocessor, filename: sourceFile })
