@@ -1,0 +1,38 @@
+{
+  "name": "@bifrost/vue",
+  "version": "1.0.0",
+  "description": "vue adapter for @bifrost/core compiler",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint --no-error-on-unmatched-pattern",
+    "standalone-lint": "npm run lint -- '{*,tests/**/*}.{js,cjs,mjs}'",
+    "test": "node bin/test.js",
+    "lint-staged": "npx lint-staged"
+  },
+  "author": "janouma",
+  "license": "ISC",
+  "type": "module",
+  "volta": {
+    "extends": "../../package.json"
+  },
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
+  "files": [
+    "*.js"
+  ],
+  "devDependencies": {
+    "@bifrost/utils": "^1.0.0",
+    "@japa/expect": "^3.0.2",
+    "@japa/runner": "^3.1.2",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "lint-staged": "^15.2.2",
+    "standard": "^17.1.0",
+    "vue": "^3.4.37"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.37"
+  }
+}
