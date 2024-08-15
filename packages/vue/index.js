@@ -1,8 +1,9 @@
-import { parse, compileScript/* , compileTemplate */, compileStyle } from 'vue/compiler-sfc'
+import { parse, compileScript, compileStyle } from 'vue/compiler-sfc'
 import { existsSync } from 'fs'
 import { dirname, basename } from 'path'
 
-const CUSTOM_ELEMENT_NAME = /^[a-zA-Z0-9]+(_[a-zA-Z0-9]+)+$/
+const CUSTOM_ELEMENT_NAME_PATTERN = /^[a-zA-Z0-9]+(_[a-zA-Z0-9]+)+$/
+const COMPONENT_DEFAULT_EXPORT_PATTERN = /\bexport\s+default\s*(\{.*\})/s
 
 export default async function compileComponent (
   {
@@ -32,7 +33,7 @@ export default async function compileComponent (
   const folderPath = dirname(filename)
   const folderBasename = basename(folderPath)
 
-  if (!folderBasename.match(CUSTOM_ELEMENT_NAME)) {
+  if (!folderBasename.match(CUSTOM_ELEMENT_NAME_PATTERN)) {
     throw new Error(
       `filename must match custom element name pattern (my_awesome_component). Actual "${folderBasename}"`
     )
@@ -114,20 +115,22 @@ export default async function compileComponent (
     filename
   }).code)
 
-  const componentOptions = compiledJs.match(/export\s+default\s*(\{.*\})/s)?.[1] || '{}'
+  const componentOptions = compiledJs.match(COMPONENT_DEFAULT_EXPORT_PATTERN)?.[1] || '{}'
 
   const componentName = folderBasename.split('_')
     .map((part) => `${part[0].toUpperCase()}${part.slice(1).toLowerCase()}`)
     .join('')
 
+  const componentDefinition = compiledJs.replace(COMPONENT_DEFAULT_EXPORT_PATTERN, `
+    const ${componentName} = defineCustomElement({
+      ...${componentOptions},
+      styles: [\`${compiledStyles.join('`,`')}\`]
+    })
+  `)
+
   const conbinedCode = `
-  import { defineCustomElement } from 'vue'
-
-  const ${componentName} = defineCustomElement({
-    ...${componentOptions},
-    styles: [\`${compiledStyles.join('`,`')}\`]
-  })
-
+   import { defineCustomElement } from 'vue'
+   ${componentDefinition}
   customElements.define('${id}', ${componentName})
   `
 

@@ -4,6 +4,8 @@
 
 <script setup>
   import { ref } from 'vue'
+  import schema, { validate } from 'joi'
+  import './lib/link.js'
 
   const props = defineProps({ name: String })
   const message = ref('in the world')
