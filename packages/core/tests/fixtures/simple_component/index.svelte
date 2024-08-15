@@ -2,7 +2,6 @@
   immutable={true}
 
   customElement={{
-    tag: 'simple-component',
     shadow: 'none'
   }}
 />

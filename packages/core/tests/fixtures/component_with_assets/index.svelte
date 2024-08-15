@@ -2,7 +2,6 @@
   immutable={true}
 
   customElement={{
-    tag: 'component-with-assets',
     shadow: 'none'
   }}
 />
