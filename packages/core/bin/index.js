@@ -2,6 +2,9 @@
 
 import { dirname, resolve } from 'path'
 import compileComponent from '../lib/compiler.js'
+import logger from '@bifrost/utils/logger.js'
+
+logger.logLevel = process.env.LOG_LEVEL
 
 const [command] = process.argv.slice(2)
 
