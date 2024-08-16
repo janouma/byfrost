@@ -113,7 +113,31 @@ test('should forbid custom element tag overwrite', async ({ expect }) => {
   {
     const codeWithTagOption = code.replace(/<svelte:options\s+.*?\/>/s, '<svelte:options customElement={{ tag: "the-best-component", shadow: "none" }}/>')
 
-    return expect(() => compile({ code: codeWithTagOption, scriptPreprocessor, filename })).rejects.toThrow('customElement tag option is forbiden: customElement={{ tag: "the-best-component", shadow: "none" }}')
+    await expect(() => compile({ code: codeWithTagOption, scriptPreprocessor, filename })).rejects.toThrow('customElement tag option is forbiden: customElement={{ tag: "the-best-component", shadow: "none" }}')
+  }
+
+  {
+    const codeWithTagOption = code.replace(/<svelte:options\s+.*?\/>/s, '<svelte:options customElement={{ shadow: "none" }} tag="the-best-component"/>')
+
+    await expect(() => compile({ code: codeWithTagOption, scriptPreprocessor, filename })).rejects.toThrow('legacy "tag" option (tag="the-best-component") is not allowed alongside "customElement" one ({ shadow: "none" })')
+  }
+
+  {
+    const codeWithTagOption = code.replace(/<svelte:options\s+.*?\/>/s, '<svelte:options customElement={{ shadow: "none" }} tag=\'the-best-component\'/>')
+
+    await expect(() => compile({ code: codeWithTagOption, scriptPreprocessor, filename })).rejects.toThrow('legacy "tag" option (tag=\'the-best-component\') is not allowed alongside "customElement" one ({ shadow: "none" })')
+  }
+
+  {
+    const codeWithTagOption = code.replace(/<svelte:options\s+.*?\/>/s, '<svelte:options customElement={{ shadow: "none" }} tag={"the-best-component"}/>')
+
+    await expect(() => compile({ code: codeWithTagOption, scriptPreprocessor, filename })).rejects.toThrow('legacy "tag" option (tag={"the-best-component"}) is not allowed alongside "customElement" one ({ shadow: "none" })')
+  }
+
+  {
+    const codeWithTagOption = code.replace(/<svelte:options\s+.*?\/>/s, '<svelte:options customElement={{ shadow: "none" }} tag={\'the-best-component\'}/>')
+
+    return expect(() => compile({ code: codeWithTagOption, scriptPreprocessor, filename })).rejects.toThrow('legacy "tag" option (tag={\'the-best-component\'}) is not allowed alongside "customElement" one ({ shadow: "none" })')
   }
 })
 

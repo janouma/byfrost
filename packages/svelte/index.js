@@ -1,14 +1,15 @@
 import { compile, preprocess } from 'svelte/compiler'
 import { existsSync } from 'fs'
 import { dirname, basename } from 'path'
+import logger from '@bifrost/utils/logger.js'
+
+const log = logger.getLogger('svelte/index')
 
 // RegExp doc = https://extendsclass.com/regex/c817870
 // password = svelte:options
-const TAG_OPTION_PATTERN = /<svelte:options\s+.*?\bcustomElement\s*=\s*((\{?("|').*?\3\}?)|\{\{.*?\btag\s*:\s*("|').*?\4.*?\}\}).*?\/>/s
+const TAG_OPTION_PATTERN = /<svelte:options\s+.*?\bcustomElement\s*=\s*((\{?("|').*?\3\}?)|(\{\{.*?\btag\s*:\s*("|').*?\5.*?\}\})).*?\/>/s
 
-// RegExp doc = https://extendsclass.com/regex/bf22122
-// password = svelte:options
-
+const LEGACY_TAG_OPTION_PATTERN = /<svelte:options\s+.*?(\btag\s*=\s*\{?("|').*?\2\}?).*?\/>/s
 const CUSTOM_ELEMENT_NAME_PATTERN = /^[a-zA-Z0-9]+(_[a-zA-Z0-9]+)+$/
 const SVELTE_OPTIONS_PATTERN = /<svelte:options\s+.*?\/>/s
 const CUSTOM_ELEMENT_ATTRIBUTE_PATTERN = /\bcustomElement\s*=\s*(\{(\{.*?\})\})/s
@@ -77,10 +78,17 @@ export default async function compileComponent (
   let code
 
   if (svelteOptions) {
+    const legacyTagOption = rawCode.match(LEGACY_TAG_OPTION_PATTERN)?.[1]
     const customElementValue = svelteOptions.match(CUSTOM_ELEMENT_ATTRIBUTE_PATTERN)?.[2]
     let svelteOptionsWithTag
 
     if (customElementValue) {
+      if (legacyTagOption) {
+        throw new Error(
+          `legacy "tag" option (${legacyTagOption}) is not allowed alongside "customElement" one (${customElementValue})`
+        )
+      }
+
       const tagPropertyAddon = customElementValue.match(/\{.+\}/s)
         ? `, tag: '${tag}'}`
         : `tag: '${tag}'}`
@@ -92,6 +100,10 @@ export default async function compileComponent (
         `customElement={${customElementValueWithTag}}`
       )
     } else {
+      if (legacyTagOption) {
+        log.warn(`legacy "tag" option (${legacyTagOption}) will be ignored`)
+      }
+
       svelteOptionsWithTag = svelteOptions.replace(/\s?\/>$/s, ` customElement="${tag}"/>`)
     }
 
