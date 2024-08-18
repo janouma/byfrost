@@ -12,6 +12,9 @@
     "standard": "^17.1.0",
     "testdouble": "^3.20.2"
   },
+  "bin": {
+    "@bifrost/utils": "bin/index.js"
+  },
   "scripts": {
     "lint": "eslint --no-error-on-unmatched-pattern",
     "standalone-lint": "npm run lint -- '{*,tests/**/*}.{js,cjs,mjs}'",
@@ -30,6 +33,8 @@
   },
   "files": [
     "*.js",
-    "tests/helpers"
+    "bin/index.js",
+    "tests/helpers",
+    "!.DS_Store"
   ]
 }

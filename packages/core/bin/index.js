@@ -3,9 +3,11 @@
 import { dirname, resolve } from 'path'
 import compileComponent from '../lib/compiler.js'
 import logger from '@bifrost/utils/logger.js'
+import { argsArrayToArgsObject } from '@bifrost/utils/args.js'
 
 logger.logLevel = process.env.LOG_LEVEL
 
+const log = logger.getLogger('core/bin/index')
 const [command] = process.argv.slice(2)
 
 if (!command) {
@@ -14,14 +16,14 @@ if (!command) {
 
 switch (command) {
   case '--help': {
-    console.info('\x1b[1m\x1b[32m--help\x1b[89m\x1b[22m\x1b[0m\t\tPrint the current help\n')
-    console.info('\x1b[1m\x1b[32mcompile\x1b[89m\x1b[22m\x1b[0m\t\tCompile a component folder and save the result under the given build folder\n')
-    console.info('  Arguments:\n')
-    console.info('  \x1b[1m\x1b[34msource=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[31mrequired\x1b[89m\x1b[22m\x1b[0m\t\tPath to the component folder')
-    console.info('  \x1b[1m\x1b[34mdestination=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\x1b[1m\x1b[31mrequired\x1b[89m\x1b[22m\x1b[0m\t\tPath to the build folder hosting all built components')
-    console.info('  \x1b[1m\x1b[34msourceMap=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34myes/no\x1b[89m\x1b[23m\x1b[0m\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tWhether or not the sourcemap should be generated')
-    console.info('  \x1b[1m\x1b[34mprefix=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34murl\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tCss assets absolute or relative url prefix')
-    console.info('  \x1b[1m\x1b[34mconfig=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tPath to the compile config file. Default to bifrost.config.js')
+    log.info('\x1b[1m\x1b[32m--help\x1b[89m\x1b[22m\x1b[0m\t\tPrint the current help\n')
+    log.info('\x1b[1m\x1b[32mcompile\x1b[89m\x1b[22m\x1b[0m\t\tCompile a component folder and save the result under the given build folder\n')
+    log.info('  Arguments:\n')
+    log.info('  \x1b[1m\x1b[34msource=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[31mrequired\x1b[89m\x1b[22m\x1b[0m\t\tPath to the component folder')
+    log.info('  \x1b[1m\x1b[34mdestination=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\x1b[1m\x1b[31mrequired\x1b[89m\x1b[22m\x1b[0m\t\tPath to the build folder hosting all built components')
+    log.info('  \x1b[1m\x1b[34msourceMap=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34myes/no\x1b[89m\x1b[23m\x1b[0m\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tWhether or not the sourcemap should be generated')
+    log.info('  \x1b[1m\x1b[34mprefix=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34murl\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tCss assets absolute or relative url prefix')
+    log.info('  \x1b[1m\x1b[34mconfig=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tPath to the compile config file. Default to bifrost.config.js')
     break
   }
 
@@ -40,13 +42,14 @@ switch (command) {
 }
 
 async function compile () {
-  const { source, destination, sourceMap, prefix, config: configPath = 'bifrost.config.js' } = readCommandArguments()
+  const { source, destination, sourceMap, prefix, config: configPath = 'bifrost.config.js' } = argsArrayToArgsObject()
+
   let absoluteConfigPath
 
   try {
     absoluteConfigPath = resolve(configPath)
   } catch (error) {
-    console.warn(configPath + ' config file not found')
+    log.warn(configPath + ' config file not found')
   }
 
   const { default: config } = absoluteConfigPath ? await import(absoluteConfigPath) : {}
@@ -59,16 +62,4 @@ async function compile () {
     config,
     configWorkingDirectory: config && dirname(absoluteConfigPath)
   })
-}
-
-function readCommandArguments () {
-  return process.argv.slice(3)
-    .reduce((result, arg) => {
-      const [name, ...values] = arg.split('=')
-
-      return {
-        ...result,
-        [name]: values.join('=')
-      }
-    }, {})
 }
