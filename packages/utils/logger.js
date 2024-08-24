@@ -2,7 +2,7 @@ const SILENT = 'silent'
 const logLevels = [SILENT, 'error', 'warn', 'info', 'log', 'debug']
 
 let [logLevel] = logLevels
-let logConfig = Promise.resolve()
+let logConfig
 let loadLogLevel
 let saveLogLevel
 let loggers
@@ -25,6 +25,7 @@ export default Object.freeze({
   },
 
   get loadLogLevel () { return loadLogLevel },
+  get logLevelLoading () { return logConfig ?? Promise.resolve() },
 
   set saveLogLevel (logLevelSaver) { saveLogLevel = logLevelSaver },
   get saveLogLevel () { return saveLogLevel },
@@ -53,12 +54,10 @@ export default Object.freeze({
 })
 
 function log (level, name, ...args) {
-  logConfig.then(() => {
-    if (canLog(level)) {
-      const prefixedArgs = name ? [name + ':', ...args] : args
-      console[level](...prefixedArgs)
-    }
-  })
+  if (canLog(level)) {
+    const prefixedArgs = name ? [name + ':', ...args] : args
+    console[level](...prefixedArgs)
+  }
 }
 
 function canLog (level) {
