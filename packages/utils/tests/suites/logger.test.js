@@ -10,7 +10,8 @@ const logLevels = [
   'warn',
   'info',
   'log',
-  'debug'
+  'debug',
+  'trace'
 ]
 
 async function importLogger () {

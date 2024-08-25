@@ -122,23 +122,33 @@ export default async function compileComponent (
 
   const sourceMapFilename = 'index.js.map'
 
-  const {
-    code: minifiedJs,
-    map: minifiedSourceMap,
-    error: minifyError
-  } = await minify(
-    compiledJs,
-    enableSourcemap && {
-      sourceMap: {
-        content: compiledSourceMap,
-        url: sourceMapFilename
-      }
-    }
-  )
+  let minifiedJs
+  let minifiedSourceMap
 
-  if (minifyError) {
-    const { message, line, col, pos } = minifyError
-    throw new Error(`${message}\n\tline: ${line}, column: ${col}, position: ${pos}`)
+  try {
+    let minifyError
+
+    ({
+      code: minifiedJs,
+      map: minifiedSourceMap,
+      error: minifyError
+    } = await minify(
+      compiledJs,
+      enableSourcemap && {
+        sourceMap: {
+          content: compiledSourceMap,
+          url: sourceMapFilename
+        }
+      }
+    ))
+
+    if (minifyError) { throw minifyError }
+  } catch (error) {
+    const { message, line, col, pos } = error
+
+    log.trace({ compiledJs })
+
+    throw new Error(`source: ${join(source, sourceName)} – ${message}\n\tline: ${line}, column: ${col}, position: ${pos}`)
   }
 
   const destinationFile = join(componentDestFolder, 'index.js')

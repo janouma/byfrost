@@ -1,5 +1,5 @@
 const SILENT = 'silent'
-const logLevels = [SILENT, 'error', 'warn', 'info', 'log', 'debug']
+const logLevels = [SILENT, 'error', 'warn', 'info', 'log', 'debug', 'trace']
 
 let [logLevel] = logLevels
 let logConfig

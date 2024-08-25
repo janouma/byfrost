@@ -176,4 +176,15 @@ test.group('compiler', group => {
       ).rejects.toThrow('Unknown compile error')
     }
   })
+
+  test('should handle minify error', ({ expect }) => {
+    const filename = require.resolve('../fixtures/the_best_vue_component/index.vue')
+    const source = dirname(filename)
+
+    return expect(compile({ source, destination }))
+      .rejects
+      .toThrow(
+        /source: .+\/tests\/fixtures\/the_best_vue_component\/index\.vue – Unexpected token name «fetch», expected punc «,»\s+line: 6, column: 30, position: 122/s
+      )
+  })
 })
