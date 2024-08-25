@@ -8,6 +8,7 @@ const require = createRequire(import.meta.url)
 const filename = require.resolve('../fixtures/the_best_component/index.vue')
 const code = String(readFileSync(filename))
 const expectedCompiled = String(readFileSync(require.resolve('../expectations/the_best_component.js')))
+const expectedCompiledWithoutSetup = String(readFileSync(require.resolve('../expectations/the_best_component_no_setup.js')))
 
 const expectedCompiledWithCss = String(
   readFileSync(require.resolve('../expectations/the_best_component.precss.js'))
@@ -89,6 +90,19 @@ test('should compile code', async ({ expect }) => {
   const { code: compiled, map: sourcemap } = await compile({ code, scriptPreprocessor, filename })
   expect(minify(compiled)).toBe(minify(expectedCompiled))
   expect(sourcemap).toBeFalsy()
+})
+
+test('should compile template when source has no setup', async ({ expect }) => {
+  const sourceFile = require.resolve('../fixtures/the_best_component_no_setup/index.vue')
+  const sourceCode = String(readFileSync(sourceFile))
+
+  const { code: compiled } = await compile({
+    code: sourceCode,
+    scriptPreprocessor,
+    filename: sourceFile
+  })
+
+  expect(minify(compiled)).toBe(minify(expectedCompiledWithoutSetup))
 })
 
 test('should preprocess css', async ({ expect }) => {

@@ -1,9 +1,10 @@
-import { parse, compileScript, compileStyle } from 'vue/compiler-sfc'
+import { parse, compileScript, compileStyle, compileTemplate } from 'vue/compiler-sfc'
 import { existsSync } from 'fs'
 import { dirname, basename } from 'path'
 
 const CUSTOM_ELEMENT_NAME_PATTERN = /^[a-zA-Z0-9]+(_[a-zA-Z0-9]+)+$/
 const COMPONENT_DEFAULT_EXPORT_PATTERN = /\bexport\s+default\s*(\{.*\})/s
+const RENDER_EXPORT_PATTERN = /(\s*)export\s+(function\s+render\s*\()/s
 
 export default async function compileComponent (
   {
@@ -66,12 +67,15 @@ export default async function compileComponent (
     offset: descriptor.template.loc.start.offset
   }]
 
+  let hasSetup = false
+
   for (const scriptType of ['scriptSetup', 'script']) {
     const script = descriptor[scriptType]
 
     if (script) {
       const { code: preprocessedScript } = await scriptPreprocessor({ content: script.content })
       const scriptFlag = script.setup ? ' setup' : ''
+      hasSetup ||= scriptFlag
 
       preprocessedCodes.push({
         source: `<script${scriptFlag}>${preprocessedScript}</script>`,
@@ -103,7 +107,7 @@ export default async function compileComponent (
 
   const { content: compiledJs, map } = compileScript(preprocessedDescriptor, {
     id,
-    inlineTemplate: true,
+    inlineTemplate: hasSetup,
     customElement: true,
     filename,
     sourceMap: enableSourcemap === true || enableSourcemap?.js || false
@@ -115,6 +119,20 @@ export default async function compileComponent (
     filename
   }).code)
 
+  let compiledTemplate
+
+  if (!hasSetup) {
+    const { code: rawCompiledTemplate } = compileTemplate({
+      id,
+      source: preprocessedDescriptor.template.content,
+      filename
+    })
+
+    compiledTemplate = rawCompiledTemplate.replace(RENDER_EXPORT_PATTERN, '$1$2')
+  } else {
+    compiledTemplate = ''
+  }
+
   const componentOptions = compiledJs.match(COMPONENT_DEFAULT_EXPORT_PATTERN)?.[1] || '{}'
 
   const componentName = folderBasename.split('_')
@@ -122,8 +140,10 @@ export default async function compileComponent (
     .join('')
 
   const componentDefinition = compiledJs.replace(COMPONENT_DEFAULT_EXPORT_PATTERN, `
+    ${compiledTemplate}
     const ${componentName} = defineCustomElement({
       ...${componentOptions},
+      ${compiledTemplate ? 'render,' : ''}
       styles: [\`${compiledStyles.join('`,`')}\`]
     })
   `)
