@@ -177,14 +177,9 @@ test.group('compiler', group => {
     }
   })
 
-  test('should handle minify error', ({ expect }) => {
+  test('should handle top level await', ({ expect }) => {
     const filename = require.resolve('../fixtures/the_best_vue_component/index.vue')
     const source = dirname(filename)
-
-    return expect(compile({ source, destination }))
-      .rejects
-      .toThrow(
-        /source: .+\/tests\/fixtures\/the_best_vue_component\/index\.vue – Unexpected token name «fetch», expected punc «,»\s+line: 6, column: 30, position: 122/s
-      )
+    return expect(compile({ source, destination })).resolves.toBeUndefined()
   })
 })

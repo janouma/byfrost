@@ -54,7 +54,6 @@ test.group('script_preprocessor', group => {
       )).trim()
 
       const compiled = String(readFileSync(`${destination}/the_best_component/index.js`))
-
       expect(compiled).toBe(expectedCompiled)
     }
 
@@ -64,7 +63,6 @@ test.group('script_preprocessor', group => {
       )).trim()
 
       const compiled = String(readFileSync(`${destination}/the_main_component/index.js`))
-
       expect(compiled).toBe(expectedCompiled)
     }
 

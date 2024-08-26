@@ -134,11 +134,14 @@ export default async function compileComponent (
       error: minifyError
     } = await minify(
       compiledJs,
-      enableSourcemap && {
-        sourceMap: {
-          content: compiledSourceMap,
-          url: sourceMapFilename
-        }
+      {
+        ...(enableSourcemap && {
+          sourceMap: {
+            content: compiledSourceMap,
+            url: sourceMapFilename
+          }
+        }),
+        module: true
       }
     ))
 
