@@ -96,7 +96,7 @@ test.group('#extractDependencies', () => {
         targetBounds: { end: 457, start: 439 }
       },
       {
-        type: 'plainJs',
+        type: 'other',
         start: 462,
         end: 484,
         variables: [],

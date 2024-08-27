@@ -4,7 +4,7 @@ import { parse } from 'acorn'
 export const COMPONENT_TYPE = 'component'
 export const PLAIN_JS_TYPE = 'plainJs'
 export const ASSET_TYPE = 'asset'
-export const plainJsUri = /^\.(.*?\/)+([^.]+?)(\.js)?$/
+export const plainJsUri = /^\.(.*?\/)+(.+?)\.js$/
 export const assetUri = /^\.\/assets\/.+/
 
 export function extractDependencies (code, { sourceTypes = [], includeExports = false } = {}) {
