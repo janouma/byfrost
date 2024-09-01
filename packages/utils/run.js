@@ -18,7 +18,13 @@ export default function run (args) {
 
   const commandExtraArgs = Object.entries(args)
     .filter(([name]) => !runUtilityArgs.includes(name))
-    .map(([name, value]) => value ? `${name}=${value}` : name)
+    .map(([name, value]) => {
+      if (value) {
+        const delimiter = value.includes('"') ? "'" : '"'
+        return `${name}=${delimiter}${value}${delimiter}`
+      }
+      return name
+    })
     .join(' ')
 
   const command = `${args.command} ${commandExtraArgs}`
