@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { escapeRegExp, createOffsettedSplice } from '../../string.js'
+import { escapeRegExp, createOffsettedSplice, render, compile } from '../../string.js'
 
 test.group('#escapeRegExp', () => {
   test('should escape RegExp special chars', ({ expect }) => {
@@ -41,5 +41,47 @@ test.group('#createOffsettedSplice', () => {
     string = splice(string, '080910', 15, 18)
 
     expect(string).toBe('abc010203ghi050607mno080910stuvwxyz')
+  })
+})
+
+test.group('#render', () => {
+  test('should render es6 template', ({ expect }) => {
+    const template = `
+      const \${a} = 'b';
+      const b = '\${c.toUpperCase() + '_1'}';
+    `
+
+    expect(render(template, { a: 'a', c: 'c' })).toBe(`
+      const a = 'b';
+      const b = 'C_1';
+    `)
+  })
+
+  test('should allow custom variable marker', ({ expect }) => {
+    const template = `
+      const #?{a} = 'b';
+      const b = '#?{c.toUpperCase() + '_1'}';
+    `
+
+    expect(render(template, { $: '#?', a: 'a', c: 'c' })).toBe(`
+      const a = 'b';
+      const b = 'C_1';
+    `)
+  })
+})
+
+test.group('#compile', () => {
+  test('should return an es6 template renderer function', ({ expect }) => {
+    const template = `
+      const #?{a} = 'b';
+      const b = '#?{c.toUpperCase() + '_1'}';
+    `
+
+    const renderer = compile(template, '#?')
+
+    expect(renderer({ a: 'a', c: 'c' })).toBe(`
+      const a = 'b';
+      const b = 'C_1';
+    `)
   })
 })
