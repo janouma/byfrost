@@ -149,9 +149,31 @@ export default async function compileComponent (
   `)
 
   const conbinedCode = `
-   import { defineCustomElement } from 'vue'
-   ${componentDefinition}
-  customElements.define('${id}', ${componentName})
+  import { defineCustomElement } from 'vue'
+  ${componentDefinition}
+
+  class __${componentName}__ extends ${componentName} {
+    connectedCallback () {
+      super.connectedCallback()
+
+      if (this._instance?.exposed) {
+        const exposedProps = Reflect.ownKeys(this._instance.exposed)
+          .filter(prop => !prop.startsWith('_'))
+
+        for (const prop of exposedProps) {
+          const value = this._instance.exposed[prop]
+
+          if (!(prop in this)) {
+            this[prop] = typeof value === 'function' ? value.bind(this._instance.proxy) : value
+          } else {
+            console.warn(\`'\${prop}' already in component '${id}' instance\`)
+          }
+        }
+      }
+    }
+  }
+
+  customElements.define('${id}', __${componentName}__)
   `
 
   return { code: conbinedCode, map }
