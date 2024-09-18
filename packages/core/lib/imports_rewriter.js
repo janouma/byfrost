@@ -40,7 +40,7 @@ export function rewriteModulesImports ({
     componentDestFolder: resolvePath(componentDestFolder)
   })
 
-  for (const { target: srcTarget, type, start, end } of imports) {
+  for (const { target: srcTarget, type, targetBounds: { start, end } } of imports) {
     const matches = parsedModuleMapping
       .find(([target]) => target instanceof RegExp ? srcTarget.match(target) : srcTarget === target)
 
@@ -57,17 +57,17 @@ export function rewriteModulesImports ({
         { alias, configAlias, moduleDestination, moduleDestAbsolutePath, copyModule, copyAllModules }
       )
 
-      const statement = code.substring(start, end)
-      const targetLitteral = new RegExp(`("|')${escapeRegExp(srcTarget)}\\1`)
-
       const componentMark = type === COMPONENT_TYPE &&
         !sourceTypes.some(sourceType => moduleDestination.endsWith('.' + sourceType))
         ? 'component:'
         : ''
 
-      const rewrittenImport = statement.replace(targetLitteral, `$1${componentMark}${moduleDestination}$1`)
-
-      transformedCode = splice(transformedCode, rewrittenImport, start, end)
+      transformedCode = splice(
+        transformedCode,
+        `'${componentMark}${moduleDestination}'`,
+        start,
+        end
+      )
 
       if (copyModule) {
         const aliasSrcPath = tryResolvingModule(

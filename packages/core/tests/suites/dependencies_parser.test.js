@@ -28,6 +28,16 @@ test.group('#extractDependencies', () => {
     import link, { type, sym } from './link/index.mjs'
     import './media/index'
 
+    const { config } = await import('./config.js')
+    await import('../components/menu/index.vue')
+
+    async function loadExternalAssets () {
+      await import('https://www.assets.com/loader.js')
+      await import('./local/assets/loader.js')
+      const { defaults: allAssets, fonts } = import('../artefacts/assests_list.js')
+      const { defaults: extrenalAsstes } = import('http:///artefacts.net/assests_list.js')
+    }
+
     export let title
     export * from './dev.js';`
 
@@ -102,6 +112,50 @@ test.group('#extractDependencies', () => {
         variables: [],
         target: './media/index',
         targetBounds: { end: 484, start: 469 }
+      },
+      {
+        end: 536,
+        sourceType: 'js',
+        start: 515,
+        target: './config.js',
+        targetBounds: {
+          end: 535,
+          start: 522
+        },
+        type: 'plainJs'
+      },
+      {
+        end: 585,
+        sourceType: 'vue',
+        start: 547,
+        target: '../components/menu/index.vue',
+        targetBounds: {
+          end: 584,
+          start: 554
+        },
+        type: 'other'
+      },
+      {
+        end: 731,
+        sourceType: 'js',
+        start: 697,
+        target: './local/assets/loader.js',
+        targetBounds: {
+          end: 730,
+          start: 704
+        },
+        type: 'plainJs'
+      },
+      {
+        end: 815,
+        sourceType: 'js',
+        start: 777,
+        target: '../artefacts/assests_list.js',
+        targetBounds: {
+          end: 814,
+          start: 784
+        },
+        type: 'plainJs'
       }
     ]
 
@@ -112,10 +166,10 @@ test.group('#extractDependencies', () => {
       {
         type: 'plainJs',
         sourceType: 'js',
-        start: 511,
-        end: 536,
+        start: 939,
+        end: 964,
         target: './dev.js',
-        targetBounds: { end: 535, start: 525 }
+        targetBounds: { end: 963, start: 953 }
       }
     ])
 

@@ -1,5 +1,6 @@
 import { extname } from 'path'
 import { parse } from 'acorn'
+import * as walk from 'acorn-walk'
 
 export const COMPONENT_TYPE = 'component'
 export const PLAIN_JS_TYPE = 'plainJs'
@@ -8,10 +9,30 @@ export const plainJsUri = /^\.(.*?\/)+(.+?)\.js$/
 export const assetUri = /^\.\/assets\/.+/
 
 export function extractDependencies (code, { sourceTypes = [], includeExports = false } = {}) {
-  let body
+  const nodes = []
+  const nodeTypes = ['ImportDeclaration', 'ImportExpression']
+
+  if (includeExports) {
+    nodeTypes.push(
+      'ExportNamedDeclaration',
+      'ExportDefaultDeclaration',
+      'ExportAllDeclaration',
+      'ExportSpecifier'
+    )
+  }
+
+  const processors = nodeTypes.reduce(
+    (partialProcessors, nodeType) => Object.assign(
+      partialProcessors,
+      { [nodeType]: createAstNodeProcessor(nodes, nodeType) }
+    ),
+    {}
+  )
+
+  let ast
 
   try {
-    ({ body } = parse(code, { ecmaVersion: 'latest', sourceType: 'module' }))
+    ast = parse(code, { ecmaVersion: 'latest', sourceType: 'module' })
   } catch (error) {
     if (error instanceof SyntaxError) {
       const { message, loc: { line, column } } = error
@@ -21,13 +42,11 @@ export function extractDependencies (code, { sourceTypes = [], includeExports = 
     throw error
   }
 
+  walk.recursive(ast, undefined, processors)
+
   const componentUriPatterns = sourceTypes.map(getComponentUriPattern)
 
-  return body.filter(
-    ({ type, source }) =>
-      type === 'ImportDeclaration' ||
-      (includeExports && type.match(exportDeclaration) && source)
-  ).map(({
+  return nodes.map(({
     source: { value: target, start: targetStart, end: targetEnd }, start, end, specifiers
   }) => {
     const defaultSpecifier = specifiers?.find(({ type }) => type === 'ImportDefaultSpecifier')
@@ -56,7 +75,12 @@ export function getComponentUriPattern (sourceType) {
   return new RegExp(`^(.*?/)*(.+?)/(.+?)\\.${sourceType}$`)
 }
 
-const exportDeclaration = /^Export\w+Declaration$/
+function createAstNodeProcessor (gatheredNodes, nodeType) {
+  return function processAstNode (node, state, keepWalking) {
+    if (node.source && !node.source.value?.match(/^https?:/)) { gatheredNodes.push(node) }
+    walk.base[nodeType](node, state, keepWalking)
+  }
+}
 
 function getSample (code, line, column) {
   const windowHeight = 5

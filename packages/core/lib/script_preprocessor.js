@@ -85,7 +85,7 @@ export default curry(async (
   {
     const splice = createOffsettedSplice()
 
-    for (const { target, sourceType, start, end } of componentImports) {
+    for (const { target, sourceType, targetBounds: { start, end } } of componentImports) {
       const [component, file] = Array.from(target.match(getComponentUriPattern(sourceType))).slice(-2)
       const dependencyPath = resolveModule(target, { paths: [source] })
       let targetDestinationPath
@@ -116,7 +116,7 @@ export default curry(async (
       }
 
       const destImportTarget = relativize(hostComponentDestFolder, targetDestinationPath)
-      transformedCode = splice(transformedCode, `import 'component:${destImportTarget}'`, start, end)
+      transformedCode = splice(transformedCode, `'component:${destImportTarget}'`, start, end)
     }
   }
 
