@@ -31,6 +31,9 @@ test.group('#extractDependencies', () => {
     const { config } = await import('./config.js')
     await import('../components/menu/index.vue')
 
+    const importSource = './unkonwn_at_runtime.js'
+    await import(importSource)
+
     async function loadExternalAssets () {
       await import('https://www.assets.com/loader.js')
       await import('./local/assets/loader.js')
@@ -136,24 +139,24 @@ test.group('#extractDependencies', () => {
         type: 'other'
       },
       {
-        end: 731,
+        end: 814,
         sourceType: 'js',
-        start: 697,
+        start: 780,
         target: './local/assets/loader.js',
         targetBounds: {
-          end: 730,
-          start: 704
+          end: 813,
+          start: 787
         },
         type: 'plainJs'
       },
       {
-        end: 815,
+        end: 898,
         sourceType: 'js',
-        start: 777,
+        start: 860,
         target: '../artefacts/assests_list.js',
         targetBounds: {
-          end: 814,
-          start: 784
+          end: 897,
+          start: 867
         },
         type: 'plainJs'
       }
@@ -166,10 +169,10 @@ test.group('#extractDependencies', () => {
       {
         type: 'plainJs',
         sourceType: 'js',
-        start: 939,
-        end: 964,
+        start: 1022,
+        end: 1047,
         target: './dev.js',
-        targetBounds: { end: 963, start: 953 }
+        targetBounds: { end: 1046, start: 1036 }
       }
     ])
 

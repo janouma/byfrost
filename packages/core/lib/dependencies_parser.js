@@ -1,6 +1,9 @@
 import { extname } from 'path'
 import { parse } from 'acorn'
 import * as walk from 'acorn-walk'
+import logger from '@bifrost/utils/logger.js'
+
+const log = logger.getLogger('core/dependencies_parser')
 
 export const COMPONENT_TYPE = 'component'
 export const PLAIN_JS_TYPE = 'plainJs'
@@ -9,7 +12,7 @@ export const plainJsUri = /^\.(.*?\/)+(.+?)\.js$/
 export const assetUri = /^\.\/assets\/.+/
 
 export function extractDependencies (code, { sourceTypes = [], includeExports = false } = {}) {
-  const nodes = []
+  const selectedNodes = []
   const nodeTypes = ['ImportDeclaration', 'ImportExpression']
 
   if (includeExports) {
@@ -24,7 +27,7 @@ export function extractDependencies (code, { sourceTypes = [], includeExports = 
   const processors = nodeTypes.reduce(
     (partialProcessors, nodeType) => Object.assign(
       partialProcessors,
-      { [nodeType]: createAstNodeProcessor(nodes, nodeType) }
+      { [nodeType]: createAstNodeProcessor({ selectedNodes, code }, nodeType) }
     ),
     {}
   )
@@ -46,7 +49,7 @@ export function extractDependencies (code, { sourceTypes = [], includeExports = 
 
   const componentUriPatterns = sourceTypes.map(getComponentUriPattern)
 
-  return nodes.map(({
+  return selectedNodes.map(({
     source: { value: target, start: targetStart, end: targetEnd }, start, end, specifiers
   }) => {
     const defaultSpecifier = specifiers?.find(({ type }) => type === 'ImportDefaultSpecifier')
@@ -75,9 +78,25 @@ export function getComponentUriPattern (sourceType) {
   return new RegExp(`^(.*?/)*(.+?)/(.+?)\\.${sourceType}$`)
 }
 
-function createAstNodeProcessor (gatheredNodes, nodeType) {
+function createAstNodeProcessor ({ selectedNodes, code }, nodeType) {
   return function processAstNode (node, state, keepWalking) {
-    if (node.source && !node.source.value?.match(/^https?:/)) { gatheredNodes.push(node) }
+    const { source, start, end } = node
+
+    if (source?.value) {
+      if (!source.value.match(/^https?:/)) { selectedNodes.push(node) }
+    } else if (source) {
+      const margin = 200
+      const [startWithMargin, endWithMargin] = [Math.max(0, start - margin), Math.min(end + margin, code.length)]
+      const relativeStart = start - startWithMargin
+
+      const sample = code.slice(startWithMargin, endWithMargin)
+        .split('')
+        .toSpliced(relativeStart, 0, '▶')
+        .join('')
+
+      log.warn('The following dependency (marked with ▶) will be ignored:\n\n' + sample)
+    }
+
     walk.base[nodeType](node, state, keepWalking)
   }
 }
