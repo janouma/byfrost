@@ -55,8 +55,14 @@ export default Object.freeze({
 
 function log (level, name, ...args) {
   if (canLog(level)) {
-    const prefixedArgs = name ? [name + ':', ...args] : args
-    console[level](...prefixedArgs)
+    const isBrowserEnvironment = typeof window !== 'undefined'
+    const [nameSeparator, levelSeparator] = isBrowserEnvironment
+      ? ['', '']
+      : [' ▷', ' |']
+
+    const LEVEL = level.toUpperCase()
+    const prefixedArgs = name ? [name + nameSeparator, ...args] : args
+    console[level](LEVEL.padStart(5, ' ') + levelSeparator, ...prefixedArgs)
   }
 }
 

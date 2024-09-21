@@ -27,7 +27,11 @@ test.group('logger', group => {
     }
   })
 
-  group.each.teardown(() => td.reset())
+  group.each.teardown(() => {
+    td.reset()
+    delete globalThis.window
+  })
+
   group.teardown(() => { globalThis.console = nativeConsole })
 
   test('#getLogger should return logger delagate', async ({ expect }) => {
@@ -47,8 +51,13 @@ test.group('logger', group => {
 
     logger.logLevel = 'info'
     log.info(logMessage)
-    await nextTick()
-    td.verify(console.info(loggerName + ':', logMessage))
+    td.verify(console.info(' INFO |', loggerName + ' ▷', logMessage))
+    td.reset()
+
+    globalThis.window = {}
+
+    log.info(logMessage)
+    td.verify(console.info(' INFO', loggerName, logMessage))
   })
 
   test('#getLogger should validate name argument', async ({ expect }) => {
@@ -85,7 +94,10 @@ test.group('logger', group => {
         logger[voicedLevel](logMessage)
         await nextTick()
 
-        td.verify(console[voicedLevel](logMessage))
+        td.verify(console[voicedLevel](
+          voicedLevel.toUpperCase().padStart(5, ' ') + ' |',
+          logMessage
+        ))
         td.reset()
       }
     })
