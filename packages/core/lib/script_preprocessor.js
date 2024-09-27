@@ -19,7 +19,6 @@ import {
 
 const require = createRequire(import.meta.url)
 const leadingDotSlash = /^\.\//
-const cache = new Map()
 
 export default curry(async (
   {
@@ -30,6 +29,7 @@ export default curry(async (
     config,
     moduleResolutionPaths,
     configWorkingDirectory,
+    cache,
 
     // only for test purpose
     resolveModule = require.resolve
@@ -106,6 +106,7 @@ export default curry(async (
           enableSourcemap,
           config,
           configWorkingDirectory,
+          cache,
 
           moduleResolutionPaths: [
             dependencySourceFolder,
@@ -138,8 +139,3 @@ export default curry(async (
 
   return { code: transformedCode }
 })
-
-// only for test purpose
-export function clearCache () {
-  cache.clear()
-}

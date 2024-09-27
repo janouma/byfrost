@@ -2,10 +2,7 @@ import { createRequire } from 'module'
 import { readFileSync, existsSync, mkdirSync, rmSync } from 'fs'
 import { dirname, resolve, basename } from 'path'
 import { test } from '@japa/runner'
-
-import createScriptPreprocessor, { clearCache as clearCompileCache }
-  from '../../lib/script_preprocessor.js'
-
+import createScriptPreprocessor from '../../lib/script_preprocessor.js'
 import { clearCache as clearCopyCache } from '../../lib/imports_rewriter.js'
 
 const require = createRequire(import.meta.url)
@@ -24,7 +21,6 @@ test.group('script_preprocessor', group => {
     }
 
     mkdirSync(destination, { recursive: true })
-    clearCompileCache()
     clearCopyCache()
   })
 
@@ -37,7 +33,8 @@ test.group('script_preprocessor', group => {
       source,
       destination,
       moduleResolutionPaths,
-      config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } }
+      config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } },
+      cache: new Map()
     })
 
     const code = `import '../the_main_component/index.svelte'
@@ -108,7 +105,8 @@ test.group('script_preprocessor', group => {
         source,
         destination,
         moduleResolutionPaths,
-        config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } }
+        config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } },
+        cache: new Map()
       })
 
       const code = "import icon from './assets/images/icon.svg'"
@@ -122,7 +120,8 @@ test.group('script_preprocessor', group => {
         destination,
         moduleResolutionPaths,
         config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } },
-        prefix: 'prefix'
+        prefix: 'prefix',
+        cache: new Map()
       })
 
       const code = "import icon from './assets/images/icon.svg'"

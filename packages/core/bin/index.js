@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { dirname, resolve } from 'path'
+import { existsSync } from 'fs'
 import compileComponent from '../lib/compiler.js'
 import logger from '@bifrost/utils/logger.js'
 import { argsArrayToArgsObject } from '@bifrost/utils/args.js'
@@ -16,14 +17,30 @@ if (!command) {
 
 switch (command) {
   case '--help': {
-    log.info('\x1b[1m\x1b[32m--help\x1b[89m\x1b[22m\x1b[0m\t\tPrint the current help\n')
-    log.info('\x1b[1m\x1b[32mcompile\x1b[89m\x1b[22m\x1b[0m\t\tCompile a component folder and save the result under the given build folder\n')
-    log.info('  Arguments:\n')
-    log.info('  \x1b[1m\x1b[34msource=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[31mrequired\x1b[89m\x1b[22m\x1b[0m\t\tPath to the component folder')
-    log.info('  \x1b[1m\x1b[34mdestination=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\x1b[1m\x1b[31mrequired\x1b[89m\x1b[22m\x1b[0m\t\tPath to the build folder hosting all built components')
-    log.info('  \x1b[1m\x1b[34msourceMap=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34myes/no\x1b[89m\x1b[23m\x1b[0m\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tWhether or not the sourcemap should be generated')
-    log.info('  \x1b[1m\x1b[34mprefix=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34murl\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tCss assets absolute or relative url prefix')
-    log.info('  \x1b[1m\x1b[34mconfig=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tPath to the compile config file. Default to bifrost.config.js')
+    console.info('\x1b[1m\x1b[32m--help\x1b[89m\x1b[22m\x1b[0m\t\tPrint the current help\n')
+
+    console.info('\x1b[1m\x1b[32mcompile\x1b[89m\x1b[22m\x1b[0m\t\tCompile a component folder and save the result under the given build folder\n')
+
+    console.info('  Arguments:\n')
+
+    console.info('  \x1b[1m\x1b[34msource=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[31mrequired\x1b[89m\x1b[22m\x1b[0m\t\tPath to the component folder')
+
+    console.info('  \x1b[1m\x1b[34mdestination=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\x1b[1m\x1b[31mrequired\x1b[89m\x1b[22m\x1b[0m\t\tPath to the build folder hosting all built components')
+
+    console.info('  \x1b[1m\x1b[34msourceMap=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34myes/no\x1b[89m\x1b[23m\x1b[0m\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tWhether or not the sourcemap should be generated')
+
+    console.info('  \x1b[1m\x1b[34mprefix=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34murl\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tCss assets absolute or relative url prefix')
+
+    console.info('  \x1b[1m\x1b[34mconfig=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tPath to the compile config file. Default to bifrost.config.js')
+
+    console.info(`  \x1b[1m\x1b[34mcache=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tPath to a module exporting an object, as default, having the following interface:
+
+\t\t\t\t\t\t{
+\t\t\t\t\t\t  has: (sourcePath: String) => Boolean;
+\t\t\t\t\t\t  get: (sourcePath: String) => String;
+\t\t\t\t\t\t  set: (sourcePath: String, compiledPath: String) => void;
+\t\t\t\t\t\t}`)
+
     break
   }
 
@@ -42,17 +59,33 @@ switch (command) {
 }
 
 async function compile () {
-  const { source, destination, sourceMap, prefix, config: configPath = 'bifrost.config.js' } = argsArrayToArgsObject()
+  const {
+    source, destination, sourceMap, prefix, cache: cachePath, config: configPath = 'bifrost.config.js'
+  } = argsArrayToArgsObject()
 
-  let absoluteConfigPath
+  log.debug({ source, destination, sourceMap, prefix, configPath, cachePath })
 
-  try {
-    absoluteConfigPath = resolve(configPath)
-  } catch (error) {
+  const absoluteConfigPath = resolve(configPath)
+
+  log.debug({ absoluteConfigPath })
+
+  const { default: config } = absoluteConfigPath && existsSync(absoluteConfigPath) ? await import(absoluteConfigPath) : {}
+
+  if (!config) {
     log.warn(configPath + ' config file not found')
   }
 
-  const { default: config } = absoluteConfigPath ? await import(absoluteConfigPath) : {}
+  const cacheAbsolutePath = cachePath && resolve(cachePath)
+
+  log.debug({ cacheAbsolutePath })
+
+  if (cacheAbsolutePath && !existsSync(cacheAbsolutePath)) {
+    throw new Error(`cache module ${cacheAbsolutePath} not found`)
+  }
+
+  const { default: cache } = await import(cacheAbsolutePath)
+
+  log.trace({ cache })
 
   return compileComponent({
     source,
@@ -60,6 +93,7 @@ async function compile () {
     prefix,
     enableSourcemap: sourceMap === 'yes' && { js: true },
     config,
-    configWorkingDirectory: config && dirname(absoluteConfigPath)
+    configWorkingDirectory: config && dirname(absoluteConfigPath),
+    cache
   })
 }

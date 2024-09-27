@@ -7,6 +7,7 @@ import scriptPreprocessor from './script_preprocessor.js'
 import { rewriteModulesImports, resolveRelativeImports } from './imports_rewriter.js'
 
 const log = logger.getLogger('core/compiler')
+let defaultCache
 
 export default async function compileComponent (
   {
@@ -16,6 +17,7 @@ export default async function compileComponent (
     enableSourcemap = false,
     config,
     configWorkingDirectory,
+    cache = getDefaultCache(),
 
     moduleResolutionPaths = [
       join(destination || '', basename(source || '')),
@@ -95,7 +97,8 @@ export default async function compileComponent (
       },
 
       configWorkingDirectory,
-      moduleResolutionPaths
+      moduleResolutionPaths,
+      cache
     }),
 
     stylePreprocessor: config?.stylePreprocessor?.({ dest: (prefix ? prefix + '/' : '') + componentName }),
@@ -161,6 +164,17 @@ export default async function compileComponent (
     const destinationSourceMapFile = join(componentDestFolder, sourceMapFilename)
     writeFileSync(destinationSourceMapFile, minifiedSourceMap)
   }
+}
+
+// only for test purpose
+export function clearDefaultCache () {
+  defaultCache?.clear()
+}
+//
+
+function getDefaultCache () {
+  defaultCache ??= new Map()
+  return defaultCache
 }
 
 function copySources (source, to, target) {

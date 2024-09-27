@@ -3,9 +3,8 @@ import { readFileSync, existsSync, mkdirSync, rmSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { test } from '@japa/runner'
 import * as td from 'testdouble'
-import { clearCache as clearCompileCache } from '../../lib/script_preprocessor.js'
 import { clearCache as clearCopyCache } from '../../lib/imports_rewriter.js'
-import compile from '../../lib/compiler.js'
+import compile, { clearDefaultCache as clearCompileCache } from '../../lib/compiler.js'
 
 const require = createRequire(import.meta.url)
 
@@ -35,6 +34,27 @@ test.group('compiler', group => {
     const source = dirname(filename)
 
     await compile({ source, destination })
+
+    const compiled = String(readFileSync(`${destination}/the_best_component/index.js`))
+    expect(compiled).toBe(expectedCompiled)
+  })
+
+  test('should use provided cache', async ({ expect }) => {
+    const filename = require.resolve('../fixtures/the_best_component/index.svelte')
+
+    const expectedCompiled = String(readFileSync(
+      require.resolve('../expectations/the_best_component_with_cache.js')
+    )).trim()
+
+    const source = dirname(filename)
+    const cache = new Map()
+
+    cache.set(
+      require.resolve('../fixtures/the_main_component/index.svelte'),
+      './cache/the_main_component/index.js'
+    )
+
+    await compile({ source, destination, cache })
 
     const compiled = String(readFileSync(`${destination}/the_best_component/index.js`))
     expect(compiled).toBe(expectedCompiled)
