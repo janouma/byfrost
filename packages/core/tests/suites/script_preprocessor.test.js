@@ -95,6 +95,45 @@ test.group('script_preprocessor', group => {
     }
   })
 
+  test('should remove entry from cache on error', async ({ expect }) => {
+    const file = require.resolve('../fixtures/the_main_component/index.svelte')
+    const source = dirname(dirname(file)) + '/the_root_component'
+    const moduleResolutionPaths = [`${destination}/${basename(source)}`, source]
+    const cache = new Map()
+    const existingSource = 'existing/source/index.svelte'
+    const existingCompiled = 'existing/source/index.js'
+
+    cache.set(existingSource, existingCompiled)
+
+    const preprocess = createScriptPreprocessor({
+      source,
+      destination,
+      moduleResolutionPaths,
+      config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } },
+      cache
+    })
+
+    {
+      const code = `import '../the_missing_component/index.svelte'
+        export let name`
+
+      await preprocess({ content: code }).catch(_ => {})
+    }
+
+    expect(cache.size).toBe(1)
+    expect(cache.get(existingSource)).toBe(existingCompiled)
+
+    {
+      const code = `import '../component_with_error/index.svelte'
+        export let name`
+
+      await preprocess({ content: code }).catch(_ => {})
+    }
+
+    expect(cache.size).toBe(1)
+    expect(cache.get(existingSource)).toBe(existingCompiled)
+  })
+
   test('should transform assets import variable', async ({ expect }) => {
     const file = require.resolve('../fixtures/the_main_component/index.svelte')
     const source = dirname(dirname(file)) + '/the_root_component'

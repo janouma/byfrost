@@ -99,21 +99,26 @@ export default curry(async (
         targetDestinationPath = join(componentDestFolder, `${file}.js`)
         cache.set(dependencyPath, targetDestinationPath)
 
-        await compile({
-          source: dependencySourceFolder,
-          destination,
-          prefix,
-          enableSourcemap,
-          config,
-          configWorkingDirectory,
-          cache,
+        try {
+          await compile({
+            source: dependencySourceFolder,
+            destination,
+            prefix,
+            enableSourcemap,
+            config,
+            configWorkingDirectory,
+            cache,
 
-          moduleResolutionPaths: [
-            dependencySourceFolder,
-            join(destination, hostComponentName),
-            source
-          ]
-        })
+            moduleResolutionPaths: [
+              dependencySourceFolder,
+              join(destination, hostComponentName),
+              source
+            ]
+          })
+        } catch (error) {
+          cache.delete(dependencyPath)
+          throw error
+        }
       }
 
       const destImportTarget = relativize(hostComponentDestFolder, targetDestinationPath)

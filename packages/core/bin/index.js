@@ -39,6 +39,7 @@ switch (command) {
 \t\t\t\t\t\t  has: (sourcePath: String) => Boolean;
 \t\t\t\t\t\t  get: (sourcePath: String) => String;
 \t\t\t\t\t\t  set: (sourcePath: String, compiledPath: String) => void;
+\t\t\t\t\t\t  delete: (sourcePath: String) => void;
 \t\t\t\t\t\t}`)
 
     break
