@@ -45,7 +45,7 @@ test.group('#createOffsettedSplice', () => {
 })
 
 test.group('#render', () => {
-  test('should render es6 template', ({ expect }) => {
+  test('should render es6 simple template', ({ expect }) => {
     const template = `
       const \${a} = 'b';
       const b = '\${c.toUpperCase() + '_1'}';
@@ -55,6 +55,26 @@ test.group('#render', () => {
       const a = 'b';
       const b = 'C_1';
     `)
+  })
+
+  test('should render es6 complex template', ({ expect }) => {
+    const template = `<!-- \${
+        JSON.stringify(data)
+      } -->
+
+      <script type="importmap">
+        \${JSON.stringify(\\{
+          ...data,
+          d: 'e'
+        \\})}
+      </script>`
+
+    expect(render(template, { data: { a: 'b', b: 'c' } }))
+      .toBe(`<!-- {"a":"b","b":"c"} -->
+
+      <script type="importmap">
+        {"a":"b","b":"c","d":"e"}
+      </script>`)
   })
 
   test('should allow custom variable marker', ({ expect }) => {

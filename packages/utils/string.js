@@ -47,9 +47,11 @@ export function render (str, { $: variableMarker = '$', ...locals } = {}) {
   return compile(str, variableMarker).call(this, locals)
 }
 
-export function compile (str, variableMarker) {
-  const es6TemplateRegex =
-    new RegExp(`(\\\\)?${escapeRegExp(variableMarker)}\\{([^{}\\\\]+)\\}`, 'g')
+export function compile (str, $) {
+  const es6TemplateRegex = new RegExp(
+    `(\\\\)?${escapeRegExp($)}\\{(([^{}]*((?<=\\\\)(\\{|\\}))[^{}]*)+|([^{}\\\\]+))\\}`,
+    'g'
+  )
 
   if (typeof str !== 'string') {
     throw new Error('The argument must be a string type')
@@ -65,13 +67,14 @@ export function compile (str, variableMarker) {
 const { hasOwnProperty } = Object.prototype
 
 function parse (variable) {
-  const exp = variable.match(/\{(.*)\}/)[1]
-
   if (variable[0] === '\\') {
     return function () {
       return variable.slice(1)
     }
   }
+
+  const { expression } = variable.match(/\{\s*(?<expression>.*)\s*\}/s).groups
+  const escapeFreeExpression = expression.replace(/\\(\{|\})/g, '$1')
 
   return function () {
     let declare = ''
@@ -83,6 +86,6 @@ function parse (variable) {
     }
 
     /* eslint-disable-next-line no-new-func */
-    return new Function('locals', declare + 'return ' + exp)(this)
+    return new Function('locals', declare + 'return ' + escapeFreeExpression)(this)
   }
 }
