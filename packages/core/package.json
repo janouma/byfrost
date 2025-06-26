@@ -48,5 +48,17 @@
     "acorn": "^8.11.3",
     "acorn-walk": "^8.3.4",
     "terser": "^5.30.0"
+  },
+  "peerDependencies": {
+    "gmail-send": "^1.8.10",
+    "mjml": "^4.2.0"
+  },
+  "peerDependenciesMeta": {
+    "gmail-send": {
+      "optional": true
+    },
+    "mjml": {
+      "optional": true
+    }
   }
 }
