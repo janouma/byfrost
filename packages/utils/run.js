@@ -1,6 +1,7 @@
 import { exec } from 'child_process'
 import { readFileSync } from 'fs'
 import logger from './logger.js'
+import { not } from './args.js'
 
 const log = logger.getLogger('utils/run')
 const runUtilityArgs = ['command', 'envFile', 'run']
@@ -19,11 +20,14 @@ export default function run (args) {
   const commandExtraArgs = Object.entries(args)
     .filter(([name]) => !runUtilityArgs.includes(name))
     .map(([name, value]) => {
-      if (value) {
-        const delimiter = value.includes('"') ? "'" : '"'
+      log.debug({ name, value })
+
+      if (typeof value !== 'boolean') {
+        const delimiter = value.includes?.('"') ? "'" : '"'
         return `${name}=${delimiter}${value}${delimiter}`
       }
-      return name
+
+      return value ? name : not(name)
     })
     .join(' ')
 
