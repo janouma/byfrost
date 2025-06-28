@@ -37,6 +37,7 @@
     "*.js",
     "bin/index.js",
     "tests/helpers",
+    "tests/setup",
     "!.DS_Store"
   ]
 }
