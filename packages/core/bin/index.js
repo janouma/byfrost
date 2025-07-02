@@ -80,11 +80,15 @@ async function compile () {
 
   log.debug({ cacheAbsolutePath })
 
-  if (cacheAbsolutePath && !existsSync(cacheAbsolutePath)) {
-    throw new Error(`cache module ${cacheAbsolutePath} not found`)
-  }
+  let cache
 
-  const { default: cache } = await import(cacheAbsolutePath)
+  if (cacheAbsolutePath) {
+    if (!existsSync(cacheAbsolutePath)) {
+      throw new Error(`cache module ${cacheAbsolutePath} not found`)
+    }
+
+    ({ default: cache } = await import(cacheAbsolutePath))
+  }
 
   log.trace({ cache })
 
