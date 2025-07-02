@@ -1,4 +1,4 @@
-import logger from '@bifrost/utils/logger.js'
+import logger from './logger.js'
 
 const log = logger.getLogger('@bifrost/utils/function')
 
