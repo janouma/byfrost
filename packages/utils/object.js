@@ -1,4 +1,4 @@
-const clone = typeof global.structuredClone === 'function'
+const clone = typeof structuredClone === 'function'
   ? structuredClone
   : source => JSON.parse(JSON.stringify(source))
 
