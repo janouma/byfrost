@@ -17,10 +17,13 @@
     "standard": "^17.1.0",
     "testdouble": "^3.20.2"
   },
-
   "scripts": {
     "prepare": "husky",
     "lint-staged": "npm run lint-staged --workspaces",
     "test": "npm test --workspaces"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janouma/bifrost.git"
   }
 }

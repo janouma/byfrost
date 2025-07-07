@@ -37,5 +37,9 @@
   },
   "files": [
     "*.js"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janouma/bifrost.git"
+  }
 }
