@@ -1,7 +1,7 @@
 import { createRequire } from 'module'
 import { readFileSync } from 'fs'
 import { test } from '@japa/runner'
-import { nextTick } from '@bifrost/utils/tests/helpers/async.js'
+import { nextTick } from '@byfrost/utils/tests/helpers/async.js'
 import compile from '../../index.js'
 
 const require = createRequire(import.meta.url)
@@ -142,7 +142,7 @@ test('should handle error', async ({ expect }) => {
     .join('\n')
 
   expect(cleanMessage).toBe(`[vue/compiler-sfc] Unexpected token (4:15)
-/Users/Shared/work/bifrost/packages/vue/tests/fixtures/syntax_error_component.vue
+/Users/Shared/work/byfrost/packages/vue/tests/fixtures/syntax_error_component.vue
 5  |    import { ref } from 'vue'
 6  |
 7  |    const props =; defineProps({ name: String })

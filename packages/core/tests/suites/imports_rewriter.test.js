@@ -106,8 +106,8 @@ test.group('#rewriteModulesImports', group => {
     import 'joi'
     import { onMount } from 'svelte'
     import { tick } from 'svelte/internal'
-    import logger from '@bifrost/utils/logger.js'
-    import { curry } from '@bifrost/utils/function.js'
+    import logger from '@byfrost/utils/logger.js'
+    import { curry } from '@byfrost/utils/function.js'
     import util from 'lib/utils.js'
 
     import {
@@ -142,9 +142,9 @@ test.group('#rewriteModulesImports', group => {
         destination: '../output/packages/not/imported/index.js'
       },
 
-      '/^@bifrost/utils/(.+)$/': {
-        alias: '@bifrost/utils/$1',
-        destination: '../output/packages/@bifrost/utils/common/$1'
+      '/^@byfrost/utils/(.+)$/': {
+        alias: '@byfrost/utils/$1',
+        destination: '../output/packages/@byfrost/utils/common/$1'
       },
 
       '/^lib/(.+)$/': {
@@ -171,8 +171,8 @@ test.group('#rewriteModulesImports', group => {
     import '../packages/joi-browser.min.js'
     import { onMount } from '../packages/svelte/internal/index.js'
     import { tick } from '../packages/svelte/internal/index.js'
-    import logger from '../packages/@bifrost/utils/common/logger.js'
-    import { curry } from '../packages/@bifrost/utils/common/function.js'
+    import logger from '../packages/@byfrost/utils/common/logger.js'
+    import { curry } from '../packages/@byfrost/utils/common/function.js'
     import util from '../lib/utils.js'
 
     import {
@@ -186,8 +186,8 @@ test.group('#rewriteModulesImports', group => {
       'joi/dist/joi-browser.min.js': '../output/packages/joi-browser.min.js',
       'svelte/internal': '../output/packages/svelte/internal/index.js',
       '../fixtures/lib/core.js': '../output/lib/core.js',
-      '@bifrost/utils/logger.js': '../output/packages/@bifrost/utils/common/logger.js',
-      '@bifrost/utils/function.js': '../output/packages/@bifrost/utils/common/function.js'
+      '@byfrost/utils/logger.js': '../output/packages/@byfrost/utils/common/logger.js',
+      '@byfrost/utils/function.js': '../output/packages/@byfrost/utils/common/function.js'
     }
 
     for (const [dependency, copy] of Object.entries(dependencies)) {

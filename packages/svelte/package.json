@@ -1,10 +1,10 @@
 {
-  "name": "@bifrost/svelte",
+  "name": "@byfrost/svelte",
   "version": "0.5.0",
-  "description": "svelte adapter for @bifrost/core compiler",
+  "description": "svelte adapter for @byfrost/core compiler",
   "main": "index.js",
   "devDependencies": {
-    "@bifrost/utils": "^1.0.0",
+    "@byfrost/utils": "^1.0.0",
     "@japa/expect": "^3.0.2",
     "@japa/runner": "^3.1.2",
     "eslint": "^8.57.0",
@@ -40,6 +40,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/janouma/bifrost.git"
+    "url": "git+https://github.com/janouma/byfrost.git"
   }
 }

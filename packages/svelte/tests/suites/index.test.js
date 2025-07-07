@@ -1,7 +1,7 @@
 import { createRequire } from 'module'
 import { readFileSync } from 'fs'
 import { test } from '@japa/runner'
-import { nextTick } from '@bifrost/utils/tests/helpers/async.js'
+import { nextTick } from '@byfrost/utils/tests/helpers/async.js'
 import compile from '../../index.js'
 
 const require = createRequire(import.meta.url)
@@ -212,7 +212,7 @@ test('should handle syntax error', async ({ expect }) => {
     .catch(error => error)
 
   expect(message.trim()).toBe(`parse-error — Unexpected token
-in file /Users/Shared/work/bifrost/packages/svelte/tests/fixtures/syntax_error_component/index.svelte
+in file /Users/Shared/work/byfrost/packages/svelte/tests/fixtures/syntax_error_component/index.svelte
 13: <script>
 14: export let name = 'Ze Component'
 15: name =;

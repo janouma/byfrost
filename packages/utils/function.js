@@ -1,6 +1,6 @@
 import logger from './logger.js'
 
-const log = logger.getLogger('@bifrost/utils/function')
+const log = logger.getLogger('@byfrost/utils/function')
 
 export function debounce (fn, delay) {
   if (typeof fn !== 'function') {

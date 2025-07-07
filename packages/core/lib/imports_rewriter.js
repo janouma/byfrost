@@ -10,8 +10,8 @@ import {
   normalize
 } from 'path'
 
-import logger from '@bifrost/utils/logger.js'
-import { escapeRegExp, createOffsettedSplice } from '@bifrost/utils/string.js'
+import logger from '@byfrost/utils/logger.js'
+import { escapeRegExp, createOffsettedSplice } from '@byfrost/utils/string.js'
 import { extractDependencies, COMPONENT_TYPE, PLAIN_JS_TYPE } from './dependencies_parser.js'
 
 const require = createRequire(import.meta.url)

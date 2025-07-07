@@ -1,11 +1,11 @@
-# @bifrost/utils
+# @byfrost/utils
 
 A utility package providing essential tools for command execution, logging, string manipulation, object operations, email sending, and more.
 
 ## Installation
 
 ```bash
-npm install @bifrost/utils
+npm install @byfrost/utils
 ```
 
 ## Modules
@@ -26,7 +26,7 @@ npm install @bifrost/utils
 Utilities for parsing command line arguments.
 
 ```js
-import { argsArrayToArgsObject, not } from '@bifrost/utils/args.js'
+import { argsArrayToArgsObject, not } from '@byfrost/utils/args.js'
 
 // Convert process.argv to object
 const parsedArgs = argsArrayToArgsObject()
@@ -42,7 +42,7 @@ const negatedArg = not('debug') // returns 'no-debug'
 Cross-platform console coloring utilities compatible with both Node.js and browsers.
 
 ```js
-import { green, red, yellow, blue, magenta } from '@bifrost/utils/console.js'
+import { green, red, yellow, blue, magenta } from '@byfrost/utils/console.js'
 
 // Nodejs
 console.log(green('Success message')) // => console.log('\x1B[1m\x1B[32mSuccess message\x1B[89m\x1B[22m\x1B[0m')
@@ -59,7 +59,7 @@ console.debug(...magenta('Debug message')) // => console.info(...['%cDebug messa
 Flexible logging system with level-based filtering and named loggers.
 
 ```js
-import logger from '@bifrost/utils/logger.js'
+import logger from '@byfrost/utils/logger.js'
 
 // Set global log level
 logger.logLevel = 'debug' // 'silent', 'error', 'warn', 'info', 'log', 'debug', 'trace'
@@ -93,7 +93,7 @@ logger.saveLogLevel = async (level) => {
 Email sending utilities using Gmail API with MJML template support.
 
 ```js
-import { createSender } from '@bifrost/utils/mail.js'
+import { createSender } from '@byfrost/utils/mail.js'
 
 // Create email sender
 const sendEmail = createSender({
@@ -163,7 +163,7 @@ ${log}
 Object manipulation utilities with deep merging capabilities.
 
 ```js
-import { merge, shallowMerged } from '@bifrost/utils/object.js'
+import { merge, shallowMerged } from '@byfrost/utils/object.js'
 
 // Deep merge objects (clone all objects/arrays)
 const merged = merge(
@@ -191,20 +191,20 @@ Utility for running commands with environment file support.
 #### Usage
 
 ```bash
-npx @bifrost/utils run command=<command> [envFile=<path>] [additional-args]
+npx @byfrost/utils run command=<command> [envFile=<path>] [additional-args]
 ```
 
 #### Examples
 
 ```bash
 # Run a command with default .env file
-npx @bifrost/utils run command="node server.js"
+npx @byfrost/utils run command="node server.js"
 
 # Run with custom env file
-npx @bifrost/utils run command="npm start" envFile=".env.production"
+npx @byfrost/utils run command="npm start" envFile=".env.production"
 
 # Pass additional arguments
-npx @bifrost/utils run command="node app.js" port=3000 debug
+npx @byfrost/utils run command="node app.js" port=3000 debug
 ```
 
 Set higher or lower log level with `LOG_LEVEL` environment variable.
@@ -216,7 +216,7 @@ Register cleanup functions to run before process shutdown.
 
 ```js
 import { rm } from 'fs'
-import { register } from '@bifrost/utils/shutdown_cleaner.js'
+import { register } from '@byfrost/utils/shutdown_cleaner.js'
 import db from './db.js'
 
 // Register cleanup functions
@@ -246,7 +246,7 @@ Cleanup will run on the following process events:
 String manipulation utilities with template rendering.
 
 ```js
-import { escapeRegExp, render, compile, createOffsettedSplice } from '@bifrost/utils/string.js'
+import { escapeRegExp, render, compile, createOffsettedSplice } from '@byfrost/utils/string.js'
 
 // Escape regex special characters
 const escaped = escapeRegExp('Hello. World?')
@@ -318,7 +318,7 @@ Testing helpers and setup utilities.
 
 ```js
 // Async helpers
-import { nextTick, waitForPredicate } from '@bifrost/utils/tests/helpers/async.js'
+import { nextTick, waitForPredicate } from '@byfrost/utils/tests/helpers/async.js'
 
 await nextTick()
 
@@ -329,7 +329,7 @@ await waitForPredicate({
 })
 
 // Mock localStorage for testing
-import { mockLocalStorage } from '@bifrost/utils/tests/setup/globals.js'
+import { mockLocalStorage } from '@byfrost/utils/tests/setup/globals.js'
 
 if (globalThis.localStorage) {
   jest.spyOn(globalThis, 'localStorage', 'get').mockImplementation(() => mockLocalStorage)

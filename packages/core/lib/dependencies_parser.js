@@ -1,7 +1,7 @@
 import { extname } from 'path'
 import { parse } from 'acorn'
 import * as walk from 'acorn-walk'
-import logger from '@bifrost/utils/logger.js'
+import logger from '@byfrost/utils/logger.js'
 
 const log = logger.getLogger('core/dependencies_parser')
 

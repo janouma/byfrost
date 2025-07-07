@@ -1,11 +1,11 @@
-# @bifrost/core
+# @byfrost/core
 
 A web components micro builder that compiles components from various source formats (Svelte, Vue – More format can be added) into optimized, minified JavaScript modules.
 
 ## Installation
 
 ```bash
-npm install @bifrost/core
+npm install @byfrost/core
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ npm install @bifrost/core
 The package provides a CLI tool that can be used to compile web components:
 
 ```bash
-npx @bifrost/core compile source=./src/components/my-component destination=./dist
+npx @byfrost/core compile source=./src/components/my-component destination=./dist
 ```
 
 #### Available Commands
@@ -32,29 +32,29 @@ npx @bifrost/core compile source=./src/components/my-component destination=./dis
 **Optional:**
 - `sourceMap=yes/no` - Whether to generate source maps (default: no)
 - `prefix=url` - CSS assets absolute or relative URL prefix for asset paths
-- `config=path` - Path to the compile configuration file (default: `bifrost.config.js`)
+- `config=path` - Path to the compile configuration file (default: `byfrost.config.js`)
 - `cache=path` - Path to a module exporting a cache object (see Cache Interface below)
 
 ### Examples
 
 #### Basic Compilation
 ```bash
-npx @bifrost/core compile source=./src/my-component destination=./dist
+npx @byfrost/core compile source=./src/my-component destination=./dist
 ```
 
 #### With Source Maps
 ```bash
-npx @bifrost/core compile source=./src/my-component destination=./dist sourceMap=yes
+npx @byfrost/core compile source=./src/my-component destination=./dist sourceMap=yes
 ```
 
 #### With Asset Prefix
 ```bash
-npx @bifrost/core compile source=./src/my-component destination=./dist prefix=/assets
+npx @byfrost/core compile source=./src/my-component destination=./dist prefix=/assets
 ```
 
 #### With Custom Config
 ```bash
-npx @bifrost/core compile source=./src/my-component destination=./dist config=./my-config.js
+npx @byfrost/core compile source=./src/my-component destination=./dist config=./my-config.js
 ```
 
 ## Component Structure
@@ -76,7 +76,7 @@ my-component/
 
 ## Configuration File
 
-Create a `bifrost.config.js` file in your project root to customize the build process.
+Create a `byfrost.config.js` file in your project root to customize the build process.
 All config properties as well as the config file itself are optional.
 
 Here is an example:
@@ -94,8 +94,8 @@ export default {
   // Map source file extensions to their respective compilers
   srcTypesCompilerMapping: {
     // Default values
-    // svelte: '@bifrost/svelte',
-    // vue: '@bifrost/vue',
+    // svelte: '@byfrost/svelte',
+    // vue: '@byfrost/vue',
 
     // If one wants to add react support (module not provided)
     react: <react to custom element compiler name or path>
@@ -132,8 +132,8 @@ export default {
       destination: './packages/element-adapter/dist/element-adapter.esm.js'
     },
 
-    '/^@bifrost/utils/(.+)$/': {
-      destination: './packages/@bifrost/utils/$1'
+    '/^@byfrost/utils/(.+)$/': {
+      destination: './packages/@byfrost/utils/$1'
     },
 
     '/^lib/(.+)$/': {
@@ -188,7 +188,7 @@ export default {
 You can also use the compiler programmatically:
 
 ```javascript
-import compileComponent from '@bifrost/core/lib/compiler.js';
+import compileComponent from '@byfrost/core/lib/compiler.js';
 import cache from './cache.js'
 
 await compileComponent({
@@ -200,7 +200,7 @@ await compileComponent({
   configWorkingDirectory: './',
   config: {
     srcTypesCompilerMapping: {
-      svelte: '@bifrost/svelte'
+      svelte: '@byfrost/svelte'
     }
   }
 });

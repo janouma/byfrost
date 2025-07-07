@@ -3,8 +3,8 @@
 import { dirname, resolve } from 'path'
 import { existsSync } from 'fs'
 import compileComponent from '../lib/compiler.js'
-import logger from '@bifrost/utils/logger.js'
-import { argsArrayToArgsObject } from '@bifrost/utils/args.js'
+import logger from '@byfrost/utils/logger.js'
+import { argsArrayToArgsObject } from '@byfrost/utils/args.js'
 
 logger.logLevel = process.env.LOG_LEVEL
 
@@ -31,7 +31,7 @@ switch (command) {
 
     console.info('  \x1b[1m\x1b[34mprefix=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34murl\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tCss assets absolute or relative url prefix')
 
-    console.info('  \x1b[1m\x1b[34mconfig=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tPath to the compile config file. Default to bifrost.config.js')
+    console.info('  \x1b[1m\x1b[34mconfig=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tPath to the compile config file. Default to byfrost.config.js')
 
     console.info(`  \x1b[1m\x1b[34mcache=\x1b[89m\x1b[22m\x1b\x1b[3m\x1b[34mpath\x1b[89m\x1b[23m\x1b[0m\t\t\x1b[1m\x1b[92moptional\x1b[39m\x1b[22m\x1b[0m\t\tPath to a module exporting an object, as default, having the following interface:
 
@@ -61,7 +61,7 @@ switch (command) {
 
 async function compile () {
   const {
-    source, destination, sourceMap, prefix, cache: cachePath, config: configPath = 'bifrost.config.js'
+    source, destination, sourceMap, prefix, cache: cachePath, config: configPath = 'byfrost.config.js'
   } = argsArrayToArgsObject()
 
   log.debug({ source, destination, sourceMap, prefix, configPath, cachePath })

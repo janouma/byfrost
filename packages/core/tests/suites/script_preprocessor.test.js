@@ -33,7 +33,7 @@ test.group('script_preprocessor', group => {
       source,
       destination,
       moduleResolutionPaths,
-      config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } },
+      config: { srcTypesCompilerMapping: { svelte: '@byfrost/svelte' } },
       cache: new Map()
     })
 
@@ -109,7 +109,7 @@ test.group('script_preprocessor', group => {
       source,
       destination,
       moduleResolutionPaths,
-      config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } },
+      config: { srcTypesCompilerMapping: { svelte: '@byfrost/svelte' } },
       cache
     })
 
@@ -144,7 +144,7 @@ test.group('script_preprocessor', group => {
         source,
         destination,
         moduleResolutionPaths,
-        config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } },
+        config: { srcTypesCompilerMapping: { svelte: '@byfrost/svelte' } },
         cache: new Map()
       })
 
@@ -158,7 +158,7 @@ test.group('script_preprocessor', group => {
         source,
         destination,
         moduleResolutionPaths,
-        config: { srcTypesCompilerMapping: { svelte: '@bifrost/svelte' } },
+        config: { srcTypesCompilerMapping: { svelte: '@byfrost/svelte' } },
         prefix: 'prefix',
         cache: new Map()
       })

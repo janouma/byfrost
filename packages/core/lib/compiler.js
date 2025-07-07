@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs'
 import { join, basename, extname } from 'path'
-import logger from '@bifrost/utils/logger.js'
+import logger from '@byfrost/utils/logger.js'
 import { spawnSync } from 'child_process'
 import { minify } from 'terser'
 import scriptPreprocessor from './script_preprocessor.js'
@@ -60,8 +60,8 @@ export default async function compileComponent (
   const sourceType = extname(sourceName).replace(/^\./, '')
 
   const srcTypesCompilerMapping = {
-    svelte: '@bifrost/svelte',
-    vue: '@bifrost/vue',
+    svelte: '@byfrost/svelte',
+    vue: '@byfrost/vue',
     ...config?.srcTypesCompilerMapping
   }
 

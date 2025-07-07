@@ -1,7 +1,7 @@
 import { compile, preprocess } from 'svelte/compiler'
 import { existsSync } from 'fs'
 import { dirname, basename } from 'path'
-import logger from '@bifrost/utils/logger.js'
+import logger from '@byfrost/utils/logger.js'
 
 const log = logger.getLogger('svelte/index')
 

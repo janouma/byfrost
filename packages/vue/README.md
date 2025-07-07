@@ -1,1 +1,1 @@
-Vue adapter for the [@bifrost/core compiler](../core/)
+Vue adapter for the [@byfrost/core compiler](../core/)

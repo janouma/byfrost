@@ -4,8 +4,8 @@ import {
   join, basename, dirname, relative as relativize, resolve as resolvePath, sep as pathSeparator
 } from 'path'
 
-import { curry } from '@bifrost/utils/function.js'
-import { createOffsettedSplice } from '@bifrost/utils/string.js'
+import { curry } from '@byfrost/utils/function.js'
+import { createOffsettedSplice } from '@byfrost/utils/string.js'
 import { rewriteModulesImports, copyWithDependencies } from './imports_rewriter.js'
 import compile from './compiler.js'
 

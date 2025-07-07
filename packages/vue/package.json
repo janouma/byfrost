@@ -1,7 +1,7 @@
 {
-  "name": "@bifrost/vue",
+  "name": "@byfrost/vue",
   "version": "0.5.0",
-  "description": "vue adapter for @bifrost/core compiler",
+  "description": "vue adapter for @byfrost/core compiler",
   "main": "index.js",
   "scripts": {
     "lint": "eslint --no-error-on-unmatched-pattern",
@@ -23,7 +23,7 @@
     "*.js"
   ],
   "devDependencies": {
-    "@bifrost/utils": "^1.0.0",
+    "@byfrost/utils": "^1.0.0",
     "@japa/expect": "^3.0.2",
     "@japa/runner": "^3.1.2",
     "eslint": "^8.57.0",
@@ -37,6 +37,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/janouma/bifrost.git"
+    "url": "git+https://github.com/janouma/byfrost.git"
   }
 }

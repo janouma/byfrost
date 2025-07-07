@@ -1,10 +1,10 @@
-# Bifrost
+# Byfrost
 
 A web components micro builder that transforms components from various source formats into optimized, production-ready JavaScript modules.
 
 ## Overview
 
-Bifrost is a suite of tools designed to compile and optimize web components from multiple frameworks into lightweight, minified JavaScript modules. At its core, Bifrost enables you to write components in your preferred framework (Svelte, Vue – and more by providing the right adapter) and compile them into framework-agnostic web components ready for production deployment.
+Byfrost is a suite of tools designed to compile and optimize web components from multiple frameworks into lightweight, minified JavaScript modules. At its core, Byfrost enables you to write components in your preferred framework (Svelte, Vue – and more by providing the right adapter) and compile them into framework-agnostic web components ready for production deployment.
 
 ## 🚀 Key Features
 
@@ -17,28 +17,28 @@ Bifrost is a suite of tools designed to compile and optimize web components from
 
 ## 📦 Packages
 
-### [@bifrost/core](./packages/core/) - The Main Engine
+### [@byfrost/core](./packages/core/) - The Main Engine
 
-The heart of Bifrost - a compiler that transforms your components into optimized web components. It provides both CLI and programmatic APIs for maximum flexibility.
+The heart of Byfrost - a compiler that transforms your components into optimized web components. It provides both CLI and programmatic APIs for maximum flexibility.
 
 **Key capabilities:**
 - Command-line interface for easy integration into build pipelines
 - Programmatic API for custom build tools
-- Configurable compilation process with `bifrost.config.js`
+- Configurable compilation process with `byfrost.config.js`
 - Asset preprocessing and optimization
 - Module import rewriting and bundling
 
-### [@bifrost/svelte](./packages/svelte/) - Svelte Adapter
+### [@byfrost/svelte](./packages/svelte/) - Svelte Adapter
 
 Enables compilation of Svelte components into web components. Seamlessly integrates with the core compiler to handle Svelte-specific syntax and features.
 
-### [@bifrost/vue](./packages/vue/) - Vue Adapter
+### [@byfrost/vue](./packages/vue/) - Vue Adapter
 
 Provides Vue component compilation support, allowing you to transform Vue Single File Components into optimized web components.
 
-### [@bifrost/utils](./packages/utils/) - Utility Toolkit
+### [@byfrost/utils](./packages/utils/) - Utility Toolkit
 
-A utility package providing essential tools for command execution, logging, string manipulation, object operations, email sending, and more. Used internally by other Bifrost packages and available for uses outside the @bifrost ecosystem.
+A utility package providing essential tools for command execution, logging, string manipulation, object operations, email sending, and more. Used internally by other Byfrost packages and available for uses outside the @byfrost ecosystem.
 
 ## 📄 License
 

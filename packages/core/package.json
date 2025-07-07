@@ -1,5 +1,5 @@
 {
-  "name": "@bifrost/core",
+  "name": "@byfrost/core",
   "version": "0.5.0",
   "description": "web components micro builder",
   "main": "bin/index.js",
@@ -24,7 +24,7 @@
     "!.DS_Store"
   ],
   "bin": {
-    "@bifrost/core": "bin/index.js"
+    "@byfrost/core": "bin/index.js"
   },
   "scripts": {
     "lint": "eslint --no-error-on-unmatched-pattern",
@@ -44,7 +44,7 @@
     "testdouble": "^3.20.2"
   },
   "dependencies": {
-    "@bifrost/utils": "^1.0.0",
+    "@byfrost/utils": "^1.0.0",
     "acorn": "^8.11.3",
     "acorn-walk": "^8.3.4",
     "terser": "^5.30.0"
@@ -63,6 +63,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/janouma/bifrost.git"
+    "url": "git+https://github.com/janouma/byfrost.git"
   }
 }
