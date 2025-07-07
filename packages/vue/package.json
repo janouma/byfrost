@@ -1,6 +1,6 @@
 {
   "name": "@bifrost/vue",
-  "version": "1.0.0",
+  "version": "0.5.0",
   "description": "vue adapter for @bifrost/core compiler",
   "main": "index.js",
   "scripts": {
