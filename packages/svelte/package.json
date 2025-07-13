@@ -22,7 +22,8 @@
     "lint": "eslint --no-error-on-unmatched-pattern",
     "standalone-lint": "npm run lint -- '{*,tests/**/*}.{js,cjs,mjs}'",
     "test": "node bin/test.js",
-    "lint-staged": "npx lint-staged"
+    "lint-staged": "npx lint-staged",
+    "tag": "if git tag -l svelte$npm_package_version | grep -q \"^svelte$npm_package_version$\"; then echo \"Tag svelte$npm_package_version already exists\"; else echo \"Adding tag svelte$npm_package_version\"; git tag svelte$npm_package_version; fi"
   },
   "keywords": [
     "svelte"

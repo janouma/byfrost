@@ -19,7 +19,8 @@
   "scripts": {
     "prepare": "husky",
     "lint-staged": "npm run lint-staged --workspaces",
-    "test": "npm test --workspaces"
+    "test": "npm test --workspaces",
+    "tag": "npm run tag --workspaces"
   },
   "repository": {
     "type": "git",
