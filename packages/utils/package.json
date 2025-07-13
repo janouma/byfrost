@@ -1,6 +1,6 @@
 {
   "name": "@byfrost/utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "utilities for @byfrost/core",
   "main": "index.js",
   "devDependencies": {
@@ -13,6 +13,18 @@
     "mjml": "^4.7.1",
     "standard": "^17.1.0",
     "testdouble": "^3.20.2"
+  },
+  "peerDependencies": {
+    "gmail-send": "^1.8.10",
+    "mjml": "^4.2.0"
+  },
+  "peerDependenciesMeta": {
+    "gmail-send": {
+      "optional": true
+    },
+    "mjml": {
+      "optional": true
+    }
   },
   "bin": {
     "@byfrost/utils": "bin/index.js"
@@ -30,15 +42,14 @@
     "extends": "../../package.json"
   },
   "engines": {
-    "node": "20.x",
-    "npm": "10.x"
+    "node": ">=20.x",
+    "npm": ">=10.x"
   },
   "files": [
     "*.js",
-    "bin/index.js",
-    "tests/helpers",
-    "tests/setup",
-    "!.DS_Store"
+    "tests/helpers/**/*.js",
+    "tests/setup/**/*.js",
+    "!bin/test.js"
   ],
   "repository": {
     "type": "git",

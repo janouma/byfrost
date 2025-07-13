@@ -9,10 +9,14 @@ let loggers
 
 export default Object.freeze({
   set logLevel (level) {
-    logLevel = level
+    if (level) {
+      logLevel = level
 
-    if (saveLogLevel) {
-      saveLogLevel(logLevel)
+      if (saveLogLevel) {
+        saveLogLevel(logLevel)
+      }
+    } else {
+      this.warn(`logLevel unchanged (${logLevel}) because provided value was falsy`)
     }
   },
 
@@ -21,7 +25,14 @@ export default Object.freeze({
   set loadLogLevel (logLevelLoader) {
     loadLogLevel = logLevelLoader
     logConfig = loadLogLevel()
-    logConfig.then(storedLevel => { logLevel = storedLevel })
+
+    logConfig.then(storedLevel => {
+      if (storedLevel) {
+        logLevel = storedLevel
+      } else {
+        this.warn(`logLevel unchanged (${logLevel}) because stored value was falsy`)
+      }
+    })
   },
 
   get loadLogLevel () { return loadLogLevel },
@@ -48,9 +59,12 @@ export default Object.freeze({
     return loggers.get(name)
   },
 
-  ...logLevels.reduce((logMethods, level) => Object.assign(logMethods, {
-    [level] (...args) { log(level, this.name, ...args) }
-  }), {})
+  ...logLevels.filter(level => level !== SILENT)
+    .reduce((logMethods, level) => Object.assign(logMethods, {
+      [level] (...args) {
+        log(level, this.name, ...args)
+      }
+    }), {})
 })
 
 function log (level, name, ...args) {
@@ -67,5 +81,5 @@ function log (level, name, ...args) {
 }
 
 function canLog (level) {
-  return level !== SILENT && logLevels.indexOf(level) <= logLevels.indexOf(logLevel)
+  return logLevels.indexOf(level) <= logLevels.indexOf(logLevel)
 }

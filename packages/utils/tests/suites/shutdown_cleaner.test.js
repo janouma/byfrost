@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import * as td from 'testdouble'
 
-const systemSignals = ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM']
+const systemSignals = ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'unhandledRejection', 'SIGTERM']
 const cleaners = []
 let register
 
@@ -30,7 +30,12 @@ test.group('shutdown_cleaner', group => {
 
   group.teardown(() => { globalThis.process = nativeProcess })
 
+  test('should not listen to system signals when no cleaner is registered', () => {
+    td.verify(process.on(), { times: 0, ignoreExtraArgs: true })
+  })
+
   test('should register clean for all system signals', () => {
+    register(...cleaners)
     td.verify(process.on(), { times: systemSignals.length, ignoreExtraArgs: true })
 
     for (const systemSignal of systemSignals) {
@@ -39,10 +44,10 @@ test.group('shutdown_cleaner', group => {
   })
 
   test('should call all cleaners when any system signal is emitted', async () => {
+    register(...cleaners)
     const captor = td.matchers.captor()
     td.verify(process.on('SIGTERM', captor.capture()))
 
-    register(...cleaners)
     const [cleanFn] = captor.values
 
     const allCleanersCompletion = cleanFn()
@@ -55,6 +60,7 @@ test.group('shutdown_cleaner', group => {
   })
 
   test('should wait for async cleaners', async () => {
+    register(...cleaners)
     const captor = td.matchers.captor()
     td.verify(process.on('SIGTERM', captor.capture()))
 
@@ -62,7 +68,6 @@ test.group('shutdown_cleaner', group => {
     const cleanerCompletion = new Promise(resolve => { completeCleaner = resolve })
     td.when(cleaners[0]()).thenReturn(cleanerCompletion)
 
-    register(...cleaners)
     const [cleanFn] = captor.values
 
     cleanFn()
@@ -76,6 +81,7 @@ test.group('shutdown_cleaner', group => {
   })
 
   test('cleaners call sequence should be the same as batch register sequence', async ({ expect }) => {
+    register(...cleaners)
     const captor = td.matchers.captor()
     td.verify(process.on('SIGTERM', captor.capture()))
 
@@ -85,7 +91,6 @@ test.group('shutdown_cleaner', group => {
     td.when(stopServer()).thenDo(() => callSequence.push('stopServer'))
     td.when(closeChromium()).thenDo(() => callSequence.push('closeChromium'))
 
-    register(...cleaners)
     const [cleanFn] = captor.values
 
     await cleanFn()
@@ -93,17 +98,17 @@ test.group('shutdown_cleaner', group => {
   })
 
   test('cleaners call sequence should be reversed from single register sequence', async ({ expect }) => {
-    const captor = td.matchers.captor()
-    td.verify(process.on('SIGTERM', captor.capture()))
-
     const callSequence = []
     const [stopServer, closeChromium] = cleaners
 
-    td.when(stopServer()).thenDo(() => callSequence.push('stopServer'))
-    td.when(closeChromium()).thenDo(() => callSequence.push('closeChromium'))
-
     register(stopServer)
     register(closeChromium)
+
+    const captor = td.matchers.captor()
+    td.verify(process.on('SIGTERM', captor.capture()))
+
+    td.when(stopServer()).thenDo(() => callSequence.push('stopServer'))
+    td.when(closeChromium()).thenDo(() => callSequence.push('closeChromium'))
 
     const [cleanFn] = captor.values
 
@@ -112,11 +117,12 @@ test.group('shutdown_cleaner', group => {
   })
 
   test('should not stop cleaning when a cleaner fails', async () => {
+    register(...cleaners)
+
     const captor = td.matchers.captor()
     td.verify(process.on('SIGTERM', captor.capture()))
     td.when(cleaners[0]()).thenReject(new Error('[fake test error] failure to stop server'))
 
-    register(...cleaners)
     const [cleanFn] = captor.values
 
     await cleanFn()

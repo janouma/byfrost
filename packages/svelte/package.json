@@ -1,16 +1,21 @@
 {
   "name": "@byfrost/svelte",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "svelte adapter for @byfrost/core compiler",
   "main": "index.js",
   "devDependencies": {
-    "@byfrost/utils": "^1.0.0",
     "@japa/expect": "^3.0.2",
     "@japa/runner": "^3.1.2",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "lint-staged": "^15.2.2",
     "standard": "^17.1.0",
+    "svelte": "^4.2.12"
+  },
+  "dependencies": {
+    "@byfrost/utils": "^1.0.1"
+  },
+  "peerDependencies": {
     "svelte": "^4.2.12"
   },
   "scripts": {
@@ -24,16 +29,13 @@
   ],
   "author": "janouma",
   "license": "ISC",
-  "peerDependencies": {
-    "svelte": "^4.2.12"
-  },
   "type": "module",
   "volta": {
     "extends": "../../package.json"
   },
   "engines": {
-    "node": "20.x",
-    "npm": "10.x"
+    "node": ">=20.x",
+    "npm": ">=10.x"
   },
   "files": [
     "*.js"

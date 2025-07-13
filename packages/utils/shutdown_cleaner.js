@@ -5,7 +5,7 @@ const log = logger.getLogger('shutdown_cleaner')
 const cleaners = []
 let shuttingDown = false
 
-async function clean () {
+async function clean (signal) {
   if (!shuttingDown) {
     shuttingDown = true
     log.info('Cleanning up before shutdown...')
@@ -20,12 +20,20 @@ async function clean () {
     }
 
     log.info('Exiting.')
-    process.exit(0)
+
+    if (signal !== 'exit') {
+      const code = ['uncaughtException', 'unhandledRejection'].includes(signal) ? 1 : 0
+      process.exit(code)
+    }
   }
 }
 
-const systemSignals = ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM']
+const systemSignals = ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'unhandledRejection', 'SIGTERM']
 
-systemSignals.forEach(signal => process.on(signal, clean))
+export const register = (...args) => {
+  if (cleaners.length === 0) {
+    systemSignals.forEach(signal => process.on(signal, () => clean(signal)))
+  }
 
-export const register = (...args) => cleaners.unshift(...args)
+  cleaners.unshift(...args)
+}

@@ -6,45 +6,47 @@ const browserToNodejsColorMap = {
   magenta: 35
 }
 
-export function green (text) {
-  return colored('green', text)
+export function green (...texts) {
+  return colored('green', ...texts)
 }
 
-export function red (text) {
-  return colored('red', text)
+export function red (...texts) {
+  return colored('red', ...texts)
 }
 
-export function yellow (text) {
-  return colored('yellow', text)
+export function yellow (...texts) {
+  return colored('yellow', ...texts)
 }
 
-export function blue (text) {
-  return colored('blue', text)
+export function blue (...texts) {
+  return colored('blue', ...texts)
 }
 
-export function magenta (text) {
-  return colored('magenta', text)
+export function magenta (...texts) {
+  return colored('magenta', ...texts)
 }
 
-function colored (color, text) {
+function colored (color, text, ...details) {
   if (typeof process !== 'undefined' && process.versions?.node) {
-    return nodeColored(browserToNodejsColorMap[color], text)
+    return nodeColored(browserToNodejsColorMap[color], text, ...details)
   }
 
   if (typeof window !== 'undefined') {
-    return browserColored(color, text)
+    return browserColored(color, text, ...details)
   }
 
   console.warn('unable to detect environment (neither nodejs nor browser)')
   return text
 }
 
-function nodeColored (color, text) {
-  return `\x1b[1m\x1b[${color}m${text}\x1b[89m\x1b[22m\x1b[0m`
+function nodeColored (color, text, ...details) {
+  return details.length === 0
+    ? `\x1b[1m\x1b[${color}m${text}\x1b[89m\x1b[22m\x1b[0m`
+    : [`\x1b[1m\x1b[${color}m`, text, ...details, '\x1b[89m\x1b[22m\x1b[0m']
 }
 
-function browserColored (color, text) {
-  return ['%c' + text, 'color: ' + color]
+function browserColored (color, ...texts) {
+  return texts.flatMap(text => ['%c' + text, 'color: ' + color])
 }
 
 // compatobility with chalk

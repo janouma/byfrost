@@ -1,1 +1,1 @@
-Svelte adapter for the [@byfrost/core compiler](../core/)
+Svelte adapter for the @byfrost/core compiler

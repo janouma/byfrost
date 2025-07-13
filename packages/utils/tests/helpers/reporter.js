@@ -16,6 +16,7 @@ function getStatusConfig (status) {
 export default class Reporter {
   #suiteLength = 0
   #testsCount = 0
+  #retriesCount = 0
   #failedCount = 0
   #passedCount = 0
   #skippedCount = 0
@@ -41,10 +42,16 @@ export default class Reporter {
     )
   }
 
+  onTestBegin (_, result) {
+    if (result.retry) {
+      this.#retriesCount++
+    }
+  }
+
   onTestEnd (test, result) {
     this.#testsCount++
 
-    const progress = Math.floor((this.#testsCount / this.#suiteLength) * 100)
+    const progress = Math.floor((this.#testsCount / (this.#suiteLength + this.#retriesCount)) * 100)
     const progressString = (String(progress) + '%').padEnd(4, ' ')
     const { icon: statusIcon, log, status: unifiedStatus } = getStatusConfig(result.status)
     const [, project, file, ...titleSegments] = test.titlePath()

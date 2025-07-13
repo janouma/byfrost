@@ -1,6 +1,6 @@
 {
   "name": "@byfrost/vue",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "vue adapter for @byfrost/core compiler",
   "main": "index.js",
   "scripts": {
@@ -16,14 +16,14 @@
     "extends": "../../package.json"
   },
   "engines": {
-    "node": "20.x",
-    "npm": "10.x"
+    "node": ">=20.x",
+    "npm": ">=10.x"
   },
   "files": [
     "*.js"
   ],
   "devDependencies": {
-    "@byfrost/utils": "^1.0.0",
+    "@byfrost/utils": "^1.0.1",
     "@japa/expect": "^3.0.2",
     "@japa/runner": "^3.1.2",
     "eslint": "^8.57.0",

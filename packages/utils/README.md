@@ -46,12 +46,12 @@ import { green, red, yellow, blue, magenta } from '@byfrost/utils/console.js'
 
 // Nodejs
 console.log(green('Success message')) // => console.log('\x1B[1m\x1B[32mSuccess message\x1B[89m\x1B[22m\x1B[0m')
-console.error(red('Error message')) // => console.error('\x1B[1m\x1B[31mError message\x1B[89m\x1B[22m\x1B[0m')
+console.error(...red('Error message', error)) // => console.error(...['\x1B[1m\x1B[31m', 'Error message', error, '\x1B[89m\x1B[22m\x1B[0m'])
 console.warn(yellow('Warning message')) // => console.warn('\x1B[1m\x1B[33mWarning message\x1B[89m\x1B[22m\x1B[0m')
 
 // Browser
 console.info(...blue('Info message')) // => console.info(...['%cInfo message', 'color: blue'])
-console.debug(...magenta('Debug message')) // => console.info(...['%cDebug message', 'color: magenta'])
+console.debug(...magenta('Debug message', 'with details')) // => console.info(...['%cDebug message', 'color: magenta', '%cwith details', 'color: magenta'])
 ```
 
 ### Logger
@@ -239,6 +239,7 @@ Cleanup will run on the following process events:
 - `SIGUSR1`
 - `SIGUSR2`
 - `uncaughtException`
+- `unhandledRejection`
 - `SIGTERM`
 
 ### String

@@ -15,24 +15,22 @@ const logLevels = [
 ]
 
 async function importLogger () {
-  return (await import('../../logger.js')).default
+  return (await import('../../logger.js?version=' + performance.now())).default
 }
 
 test.group('logger', group => {
-  group.setup(() => {
+  group.each.setup(() => {
     globalThis.console = {
-      ...logLevels.reduce((logMethods, level) => Object.assign(logMethods, {
-        [level]: td.function(level)
-      }), {})
+      ...logLevels.filter(level => level !== 'silent')
+        .reduce((logMethods, level) => Object.assign(logMethods, { [level]: td.function(level) }), {})
     }
   })
 
   group.each.teardown(() => {
     td.reset()
     delete globalThis.window
+    globalThis.console = nativeConsole
   })
-
-  group.teardown(() => { globalThis.console = nativeConsole })
 
   test('#getLogger should return logger delagate', async ({ expect }) => {
     const logger = await importLogger()
@@ -71,31 +69,28 @@ test.group('logger', group => {
   })
 
   for (const level of logLevels) {
-    test(`#${level} should be mute according to set level`, async () => {
+    test(`#${level} should log only for levels ${level} and above`, async () => {
       const logMessage = 'log message'
       const logger = await importLogger()
 
       logger.logLevel = level
 
-      const mutedLevels = logLevels
-        .filter((logLevel, index) => logLevel === 'silent' || logLevels.indexOf(level) < index)
+      const mutedMethods = logLevels.filter((_, index) => logLevels.indexOf(level) < index)
 
-      for (const mutedLevel of mutedLevels) {
-        logger[mutedLevel](logMessage)
-        await nextTick()
-
-        td.verify(console[mutedLevel](), { times: 0, ignoreExtraArgs: true })
+      for (const methodName of mutedMethods) {
+        logger[methodName](logMessage)
+        td.verify(console[methodName](), { times: 0, ignoreExtraArgs: true })
         td.reset()
       }
 
-      const voicedLevels = logLevels.filter(logLevel => !mutedLevels.includes(logLevel))
+      const voicedMethods = logLevels
+        .filter(logLevel => !mutedMethods.includes(logLevel) && logLevel !== 'silent')
 
-      for (const voicedLevel of voicedLevels) {
-        logger[voicedLevel](logMessage)
-        await nextTick()
+      for (const methodName of voicedMethods) {
+        logger[methodName](logMessage)
 
-        td.verify(console[voicedLevel](
-          voicedLevel.toUpperCase().padStart(5, ' ') + ' |',
+        td.verify(console[methodName](
+          methodName.toUpperCase().padStart(5, ' ') + ' |',
           logMessage
         ))
         td.reset()
