@@ -54,6 +54,39 @@ console.info(...blue('Info message')) // => console.info(...['%cInfo message', '
 console.debug(...magenta('Debug message', 'with details')) // => console.info(...['%cDebug message', 'color: magenta', '%cwith details', 'color: magenta'])
 ```
 
+### Function
+
+Utilities for debouncing and currying.
+
+```js
+import { debounce, curry } from '@byfrost/utils/function.js'
+
+// Debounce function calls
+const debouncedSearch = debounce((query) => {
+  console.log('Searching for:', query)
+}, 300)
+
+// Multiple rapid calls will be debounced
+debouncedSearch('hello')
+debouncedSearch('hello w')
+debouncedSearch('hello world') // Only this call executes after 300ms
+
+// Curry functions for partial application
+const add = (a, b, c) => a + b + c
+const curriedAdd = curry(add)
+
+// Can be called with all arguments at once
+curriedAdd(1, 2, 3) // => 6
+
+// Or partially applied
+const addOne = curriedAdd(1)
+const addOneAndTwo = addOne(2)
+addOneAndTwo(3) // => 6
+
+// Chain partial applications
+curriedAdd(1)(2)(3) // => 6
+```
+
 ### Logger
 
 Flexible logging system with level-based filtering and named loggers.
