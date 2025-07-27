@@ -1,6 +1,6 @@
 {
   "name": "@byfrost/utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "utilities for @byfrost/core",
   "main": "index.js",
   "devDependencies": {

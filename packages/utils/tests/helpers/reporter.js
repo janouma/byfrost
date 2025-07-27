@@ -132,4 +132,8 @@ export default class Reporter {
   onStdErr (chunk) {
     process.stderr.write(chunk)
   }
+
+  onError (error) {
+    console.error(...red('unhandled error occured:\n', error))
+  }
 }
