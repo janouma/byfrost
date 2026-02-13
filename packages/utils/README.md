@@ -89,7 +89,7 @@ curriedAdd(1)(2)(3) // => 6
 
 ### Logger
 
-Flexible logging system with level-based filtering and named loggers.
+Flexible logging system with level-based filtering, named loggers, per-logger log levels, and filters.
 
 ```js
 import logger from '@byfrost/utils/logger.js'
@@ -107,17 +107,34 @@ log.info('Info message')
 log.debug('Debug message')
 log.trace('Trace message')
 
+// Set per-logger log level (overrides global level for this logger)
+log.logLevel = 'warn' // This logger will only show warn and error
+log.info('This will not be logged')
+log.warn('This will be logged')
+logger.debug('This will still be logged') // Root logger level stays unchanged
+
+// Reset child logger to inherit from root logger
+log.logLevel = undefined
+
+// Filter logs by logger name (only matching loggers will output)
+logger.filters = ['my-module', /^api\//] // Accepts strings and RegExp
+
+// Clear filters to show all loggers outputs
+logger.filters = undefined
+
 // Add async log level loading function
-logger.loadLogLevel = async () => {
-  // Load from api
-  const logLevel = await (await fetch('/api/persisted/log-level')).text()
+logger.loadLogLevel = async (loggerName) => {
+  // Load from api (loggerName is undefined for root logger)
+  const key = loggerName ? `log-level-${loggerName}` : 'log-level'
+  const logLevel = await (await fetch(`/api/persisted/${key}`)).text()
   return logLevel
 }
 
 // Add async log level saving function
-logger.saveLogLevel = async (level) => {
-  // Save to storage
-  localStorage.logLevel = level
+logger.saveLogLevel = async (level, loggerName) => {
+  // Save to storage (loggerName is undefined for root logger)
+  const key = loggerName ? `logLevel-${loggerName}` : 'logLevel'
+  localStorage[key] = level
 }
 ```
 

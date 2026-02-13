@@ -1,36 +1,95 @@
 const SILENT = 'silent'
 const logLevels = [SILENT, 'error', 'warn', 'info', 'log', 'debug', 'trace']
+const isBrowserEnvironment = typeof window !== 'undefined'
 
-let [logLevel] = logLevels
+let filters
+let stringFilters
+let regExpFilters
 let logConfig
 let loadLogLevel
 let saveLogLevel
 let loggers
+let frozenLoggers
 
-export default Object.freeze({
+const rootLogger = {
+  _logLevel: SILENT,
+
+  get isChildLogger () {
+    // eslint-disable-next-line eqeqeq
+    return this.name != undefined
+  },
+
   set logLevel (level) {
+    const logger = this.isChildLogger ? loggers.get(this.name) : rootLogger
+
     if (level) {
-      logLevel = level
+      logger._logLevel = level
+      setLogMethods(logger)
 
       if (saveLogLevel) {
-        saveLogLevel(logLevel)
+        saveLogLevel(this._logLevel, this.name)
       }
     } else {
-      this.warn(`logLevel unchanged (${logLevel}) because provided value was falsy`)
+      if (logger.isChildLogger) {
+        delete logger._logLevel
+        resetLogMethods(logger)
+      } else {
+        this.warn(`logLevel unchanged (${this._logLevel}) because provided value was falsy`)
+      }
     }
   },
 
-  get logLevel () { return logLevel },
+  get logLevel () { return this._logLevel },
+
+  set filters (newFilters) {
+    if (
+      // eslint-disable-next-line eqeqeq
+      newFilters != undefined && (
+        !Array.isArray(newFilters) ||
+        newFilters.length === 0 ||
+        newFilters.some(filter => !filter || (typeof filter !== 'string' && !(filter instanceof RegExp)))
+      )
+    ) {
+      throw new Error(
+        '"newFilters" argument must be a non-empty array of non-empty strings or RegExps. actual: ' + JSON.stringify(newFilters)
+      )
+    }
+
+    filters = newFilters && [...newFilters]
+    stringFilters = newFilters?.filter(filter => typeof filter === 'string')
+    regExpFilters = newFilters?.filter(filter => filter instanceof RegExp)
+
+    setMuteFlag(rootLogger)
+
+    if (loggers?.size > 0) {
+      for (const logger of loggers.values()) {
+        setMuteFlag(logger)
+      }
+    }
+  },
+
+  get filters () {
+    const filtersWithFrozenItems = filters.map(filter => typeof filter === 'object' ? Object.freeze(filter) : filter)
+    return Object.freeze(filtersWithFrozenItems)
+  },
 
   set loadLogLevel (logLevelLoader) {
     loadLogLevel = logLevelLoader
-    logConfig = loadLogLevel()
+    logConfig = loadLogLevel(this.name)
 
     logConfig.then(storedLevel => {
+      const logger = this.isChildLogger ? loggers.get(this.name) : rootLogger
+
       if (storedLevel) {
-        logLevel = storedLevel
+        logger._logLevel = storedLevel
+        setLogMethods(logger)
       } else {
-        this.warn(`logLevel unchanged (${logLevel}) because stored value was falsy`)
+        if (logger.isChildLogger) {
+          delete logger._logLevel
+          resetLogMethods(logger)
+        } else {
+          this.warn(`logLevel unchanged (${this._logLevel}) because provided value was falsy`)
+        }
       }
     })
   },
@@ -48,38 +107,69 @@ export default Object.freeze({
       throw new Error(`logger name must be of type string. Actual: ${typeof name} (${name})`)
     }
 
-    loggers = loggers || new Map()
+    loggers ||= new Map()
+    frozenLoggers ||= new Map()
 
     if (!loggers.has(name)) {
       const logger = Object.create(this)
       logger.name = name
-      loggers.set(name, Object.freeze(logger))
+
+      logger.getPrefixedArgs = isBrowserEnvironment
+        ? args => [name, ...args]
+        : args => [name + ' ▷', ...args]
+
+      setMuteFlag(logger)
+      loggers.set(name, logger)
+      frozenLoggers.set(name, Object.freeze(Object.create(logger)))
     }
 
-    return loggers.get(name)
+    return frozenLoggers.get(name)
   },
 
-  ...logLevels.filter(level => level !== SILENT)
-    .reduce((logMethods, level) => Object.assign(logMethods, {
-      [level] (...args) {
-        log(level, this.name, ...args)
-      }
-    }), {})
-})
+  getPrefixedArgs: args => args,
 
-function log (level, name, ...args) {
-  if (canLog(level)) {
-    const isBrowserEnvironment = typeof window !== 'undefined'
-    const [nameSeparator, levelSeparator] = isBrowserEnvironment
-      ? ['', '']
-      : [' ▷', ' |']
+  ...logLevels
+    .filter(level => level !== SILENT).reduce((logMethods, level) => Object.assign(logMethods, { [level]: silent }), {}),
 
-    const LEVEL = level.toUpperCase()
-    const prefixedArgs = name ? [name + nameSeparator, ...args] : args
-    console[level](LEVEL.padStart(5, ' ') + levelSeparator, ...prefixedArgs)
+  canLog (level) {
+    return logLevels.indexOf(level) <= logLevels.indexOf(this._logLevel)
   }
 }
 
-function canLog (level) {
-  return logLevels.indexOf(level) <= logLevels.indexOf(logLevel)
+export default Object.freeze(Object.create(rootLogger))
+
+function setLogMethods (logger) {
+  for (const level of logLevels.filter(lvl => lvl !== SILENT)) {
+    if (logger.canLog(level)) {
+      logger[level] = function printLog (...args) {
+        if (!this.mute) {
+          log({
+            level,
+            displayedLevel: level.toUpperCase(),
+            args: this.getPrefixedArgs(args)
+          })
+        }
+      }
+    } else {
+      logger[level] = silent
+    }
+  }
+}
+
+function resetLogMethods (logger) {
+  for (const level of logLevels.filter(lvl => lvl !== SILENT)) {
+    delete logger[level]
+  }
+}
+
+function setMuteFlag (logger) {
+  logger.mute = filters && !stringFilters.includes(logger.name) && !regExpFilters.some(filter => logger.name?.match(filter))
+}
+
+function silent () { }
+
+const logSeparator = isBrowserEnvironment ? '' : ' |'
+
+function log ({ level, displayedLevel, args }) {
+  console[level](displayedLevel.padStart(5, ' ') + logSeparator, ...args)
 }
