@@ -1,6 +1,6 @@
 {
   "name": "@byfrost/core",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "web components micro builder",
   "main": "bin/index.js",
   "keywords": [
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@byfrost/utils": "^1.0.1",
-    "acorn": "^8.11.3",
+    "acorn": "^8.15.0",
     "acorn-walk": "^8.3.4",
     "terser": "^5.30.0"
   },

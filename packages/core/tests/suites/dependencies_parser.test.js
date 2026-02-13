@@ -41,6 +41,8 @@ test.group('#extractDependencies', () => {
       const { defaults: extrenalAsstes } = import('http:///artefacts.net/assests_list.js')
     }
 
+    import messages from '../assets/messages.json' with { type: 'json' }
+
     export let title
     export * from './dev.js';`
 
@@ -159,6 +161,19 @@ test.group('#extractDependencies', () => {
           start: 867
         },
         type: 'plainJs'
+      },
+      {
+        default: 'messages',
+        end: 1069,
+        sourceType: 'json',
+        start: 1001,
+        target: '../assets/messages.json',
+        targetBounds: {
+          end: 1047,
+          start: 1022
+        },
+        type: 'other',
+        variables: ['messages']
       }
     ]
 
@@ -169,10 +184,10 @@ test.group('#extractDependencies', () => {
       {
         type: 'plainJs',
         sourceType: 'js',
-        start: 1022,
-        end: 1047,
+        start: 1096,
+        end: 1121,
         target: './dev.js',
-        targetBounds: { end: 1046, start: 1036 }
+        targetBounds: { end: 1120, start: 1110 }
       }
     ])
 
