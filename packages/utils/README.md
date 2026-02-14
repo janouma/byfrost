@@ -387,6 +387,17 @@ if (globalThis.localStorage) {
 } else {
   globalThis.localStorage = mockLocalStorage
 }
+
+// Playwright custom reporter producing simpler json reports – easier to parse.
+// In your `playwright.config.js`:
+export default {
+  ...
+  reporter: [[
+    '@byfrost/utils/tests/helpers/reporter.js',
+    { outputFile: 'test/playwright-report/failures.json' }
+  ]],
+  ...
+}
 ```
 
 ## Requirements
