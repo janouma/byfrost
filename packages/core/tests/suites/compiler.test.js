@@ -103,6 +103,25 @@ test.group('compiler', group => {
     expect(styleContent).toBe(expectedStyleContent)
   })
 
+  test('should preprocess css assets', async ({ expect }) => {
+    const filename = require.resolve('../fixtures/component_with_assets/index.svelte')
+    const source = dirname(filename)
+    const stylePreprocessor = td.function('stylePreprocessor')
+    const preprocessed = '/* preprocessed css */'
+
+    const styleSourceFile = require.resolve('../fixtures/component_with_assets/styles/index.css')
+    const styleSourceContent = String(readFileSync(styleSourceFile))
+
+    td.when(stylePreprocessor({ content: styleSourceContent, filename: styleSourceFile })).thenResolve({ code: preprocessed })
+
+    const config = { stylePreprocessor: () => stylePreprocessor }
+
+    await compile({ source, destination, config })
+
+    const styleDestContent = String(readFileSync(`${destination}/component_with_assets/styles/index.css`))
+    expect(styleDestContent).toBe(preprocessed)
+  })
+
   test('should handle prefix', async () => {
     const filename = require.resolve('../fixtures/the_best_component/index.svelte')
     const source = dirname(filename)

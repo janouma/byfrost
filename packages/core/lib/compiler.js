@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs'
-import { join, basename, extname } from 'path'
+import { join, basename, extname, relative } from 'path'
 import logger from '@byfrost/utils/logger.js'
-import { spawnSync } from 'child_process'
+import { spawnSync, execSync } from 'child_process'
 import { minify } from 'terser'
 import scriptPreprocessor from './script_preprocessor.js'
 import { rewriteModulesImports, resolveRelativeImports } from './imports_rewriter.js'
@@ -72,9 +72,15 @@ export default async function compileComponent (
     mkdirSync(componentDestFolder, { recursive: true })
   }
 
-  for (const target of ['assets', 'styles']) {
-    copySources(source, componentDestFolder, target)
+  const stylePreprocessor = config?.stylePreprocessor?.({ dest: (prefix ? prefix + '/' : '') + componentName })
+
+  if (stylePreprocessor) {
+    await preprocessStylesSources(stylePreprocessor, source, componentDestFolder)
+  } else {
+    copySources(source, componentDestFolder, 'styles')
   }
+
+  copySources(source, componentDestFolder, 'assets')
 
   const sourceCode = String(readFileSync(filename))
 
@@ -101,7 +107,7 @@ export default async function compileComponent (
       cache
     }),
 
-    stylePreprocessor: config?.stylePreprocessor?.({ dest: (prefix ? prefix + '/' : '') + componentName }),
+    stylePreprocessor,
     filename
   }))
 
@@ -175,6 +181,28 @@ export function clearDefaultCache () {
 function getDefaultCache () {
   defaultCache ??= new Map()
   return defaultCache
+}
+
+async function preprocessStylesSources (stylePreprocessor, source, to) {
+  const stylesPath = join(source, 'styles')
+
+  if (existsSync(stylesPath)) {
+    const stylesDestPath = join(to, 'styles')
+
+    if (!existsSync(stylesDestPath)) {
+      mkdirSync(stylesDestPath, { recursive: true })
+    }
+
+    const files = String(execSync(`find ${stylesPath} -type f -name '*.css'`, { silent: true })).trim().split('\n')
+
+    for (const file of files) {
+      const content = String(readFileSync(file))
+      const { code } = await stylePreprocessor({ content, filename: file })
+      const relativeFilename = relative(stylesPath, file)
+      const destination = join(stylesDestPath, relativeFilename)
+      writeFileSync(destination, code)
+    }
+  }
 }
 
 function copySources (source, to, target) {
