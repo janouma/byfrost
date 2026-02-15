@@ -1,0 +1,3 @@
+{
+  "{*,tests/**/*}.{js,cjs,mjs}": "npm run lint --"
+}

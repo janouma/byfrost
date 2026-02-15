@@ -1,0 +1,44 @@
+{
+  "name": "@byfrost/plainjs",
+  "version": "0.5.0",
+  "description": "plain js adapter for @byfrost/core compiler",
+  "main": "index.js",
+  "devDependencies": {
+    "@byfrost/utils": "^1.0.3",
+    "@japa/expect": "^3.0.2",
+    "@japa/runner": "^3.1.2",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "lint-staged": "^15.2.2",
+    "standard": "^17.1.0"
+  },
+  "scripts": {
+    "lint": "eslint --no-error-on-unmatched-pattern",
+    "standalone-lint": "npm run lint -- '{*,tests/**/*}.{js,cjs,mjs}'",
+    "test": "node bin/test.js",
+    "lint-staged": "npx lint-staged",
+    "tag": "if git tag -l plainjs$npm_package_version | grep -q \"^plainjs$npm_package_version$\"; then echo \"Tag plainjs$npm_package_version already exists\"; else echo \"Adding tag plainjs$npm_package_version\"; git tag plainjs$npm_package_version; fi"
+  },
+  "keywords": [
+    "plainjs",
+    "web component",
+    "custom element"
+  ],
+  "author": "janouma",
+  "license": "ISC",
+  "type": "module",
+  "volta": {
+    "extends": "../../package.json"
+  },
+  "engines": {
+    "node": ">=20.x",
+    "npm": ">=10.x"
+  },
+  "files": [
+    "*.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janouma/byfrost.git"
+  }
+}

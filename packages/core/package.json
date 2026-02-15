@@ -51,13 +51,17 @@
   },
   "peerDependencies": {
     "@byfrost/svelte": "^0.5.1",
-    "@byfrost/vue": "^0.5.1"
+    "@byfrost/vue": "^0.5.1",
+    "@byfrost/plainjs": "^0.5.0"
   },
   "peerDependenciesMeta": {
     "@byfrost/svelte": {
       "optional": true
     },
     "@byfrost/vue": {
+      "optional": true
+    },
+    "@byfrost/plainjs": {
       "optional": true
     }
   },

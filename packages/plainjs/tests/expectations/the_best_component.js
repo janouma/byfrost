@@ -1,0 +1,28 @@
+export default class TheBestComponent extends HTMLElement {
+  static get observedAttributes () {
+    return ['name']
+  }
+
+  constructor () {
+    super()
+    this.attachShadow({ mode: 'open' })
+  }
+
+  connectedCallback () {
+    this.render()
+  }
+
+  attributeChangedCallback () {
+    this.render()
+  }
+
+  render () {
+    const name = this.getAttribute('name') || 'World'
+    this.shadowRoot.innerHTML = `
+      <link rel="stylesheet" href="./styles/main.css"/>
+      <h1>Hello ${name}!</h1>
+    `
+  }
+}
+
+customElements.define('the-best-component', TheBestComponent)
