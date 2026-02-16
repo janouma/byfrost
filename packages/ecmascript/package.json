@@ -1,7 +1,7 @@
 {
-  "name": "@byfrost/plainjs",
+  "name": "@byfrost/ecmascript",
   "version": "0.5.0",
-  "description": "plain js adapter for @byfrost/core compiler",
+  "description": "ecmascript adapter for @byfrost/core compiler",
   "main": "index.js",
   "devDependencies": {
     "@byfrost/utils": "^1.0.3",
@@ -17,10 +17,10 @@
     "standalone-lint": "npm run lint -- '{*,tests/**/*}.{js,cjs,mjs}'",
     "test": "node bin/test.js",
     "lint-staged": "npx lint-staged",
-    "tag": "if git tag -l plainjs$npm_package_version | grep -q \"^plainjs$npm_package_version$\"; then echo \"Tag plainjs$npm_package_version already exists\"; else echo \"Adding tag plainjs$npm_package_version\"; git tag plainjs$npm_package_version; fi"
+    "tag": "if git tag -l ecmascript$npm_package_version | grep -q \"^ecmascript$npm_package_version$\"; then echo \"Tag ecmascript$npm_package_version already exists\"; else echo \"Adding tag ecmascript$npm_package_version\"; git tag ecmascript$npm_package_version; fi"
   },
   "keywords": [
-    "plainjs",
+    "ecmascript",
     "web component",
     "custom element"
   ],

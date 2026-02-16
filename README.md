@@ -4,11 +4,11 @@ A web components micro builder that transforms components from various source fo
 
 ## Overview
 
-Byfrost is a suite of tools designed to compile and optimize web components from multiple frameworks into lightweight, minified JavaScript modules. At its core, Byfrost enables you to write components in your preferred framework (Svelte, Vue, Plain JS – and more by providing the right adapter) and compile them into framework-agnostic web components ready for production deployment.
+Byfrost is a suite of tools designed to compile and optimize web components from multiple frameworks into lightweight, minified JavaScript modules. At its core, Byfrost enables you to write components with your preferred library (Svelte, Vue – and more by providing the right adapter), or plain js (ECMAScript) and compile them into framework-agnostic web components ready for production deployment.
 
 ## 🚀 Key Features
 
-- **Multi-Framework Support**: Compile components from Svelte, Vue, Plain JS (.pjs) – and other formats via adapters
+- **Multi-syntax Support**: Compile components from Svelte, Vue, ECMAScript (.esm) – and other formats via adapters
 - **Intelligent Asset Handling**: Automatic copying and URL rewriting for static assets
 - **Advanced Module Mapping**: Flexible import rewriting and dependency resolution
 - **Production Optimization**: Automatic minification – and optional (beta) source maps
@@ -36,9 +36,9 @@ Enables compilation of Svelte components into web components. Seamlessly integra
 
 Provides Vue component compilation support, allowing you to transform Vue Single File Components into optimized web components.
 
-### [@byfrost/plainjs](./packages/plainjs/) - Plain JS Adapter
+### [@byfrost/ecmascript](./packages/ecmascript/) - ECMAScript Adapter
 
-Enables plain JavaScript (.pjs) components integration (web components) while still benefiting from Byfrost's build pipeline and optimization features.
+Enables ECMAScript (plain JavaScript with .esm extension) components integration (web components) while still benefiting from Byfrost's build pipeline and optimization features.
 
 ### [@byfrost/utils](./packages/utils/) - Utility Toolkit
 

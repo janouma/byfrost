@@ -52,7 +52,7 @@
   "peerDependencies": {
     "@byfrost/svelte": "^0.5.1",
     "@byfrost/vue": "^0.5.1",
-    "@byfrost/plainjs": "^0.5.0"
+    "@byfrost/ecmascript": "^0.5.0"
   },
   "peerDependenciesMeta": {
     "@byfrost/svelte": {
@@ -61,7 +61,7 @@
     "@byfrost/vue": {
       "optional": true
     },
-    "@byfrost/plainjs": {
+    "@byfrost/ecmascript": {
       "optional": true
     }
   },

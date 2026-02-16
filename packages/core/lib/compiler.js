@@ -62,7 +62,7 @@ export default async function compileComponent (
   const srcTypesCompilerMapping = {
     svelte: '@byfrost/svelte',
     vue: '@byfrost/vue',
-    pjs: '@byfrost/plainjs',
+    esm: '@byfrost/ecmascript',
     ...config?.srcTypesCompilerMapping
   }
 

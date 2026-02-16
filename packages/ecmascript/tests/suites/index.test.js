@@ -5,7 +5,7 @@ import { nextTick } from '@byfrost/utils/tests/helpers/async.js'
 import compile from '../../index.js'
 
 const require = createRequire(import.meta.url)
-const filename = require.resolve('../fixtures/the_best_component/index.pjs')
+const filename = require.resolve('../fixtures/the_best_component/index.esm')
 const code = String(readFileSync(filename))
 const expectedCompiled = String(readFileSync(require.resolve('../expectations/the_best_component.js')))
 const expectedSourcemap = String(readFileSync(require.resolve('../expectations/the_best_component.js.map')))
@@ -46,14 +46,14 @@ test('should validate parameters', async ({ expect }) => {
   await expect(() => compile({
     code,
     scriptPreprocessor,
-    filename: 'path/to/mal-formed_component/index.pjs'
+    filename: 'path/to/mal-formed_component/index.esm'
   })).rejects
     .toThrow(
       'filename must match custom element name pattern (my_awesome_component). Actual "mal-formed_component"'
     )
 
-  await expect(() => compile({ code, scriptPreprocessor, filename: 'unknown_file/index.pjs' })).rejects
-    .toThrow('source file unknown_file/index.pjs is missing')
+  await expect(() => compile({ code, scriptPreprocessor, filename: 'unknown_file/index.esm' })).rejects
+    .toThrow('source file unknown_file/index.esm is missing')
 
   await expect(() => compile({ code, scriptPreprocessor, filename, enableSourcemap: 'yes' })).rejects
     .toThrow('enableSourcemap has a wrong format (boolean | { js: boolean }). Actual "yes"')

@@ -76,7 +76,7 @@ function generateSourcemap (filename, originalCode, generatedCode) {
 
   return {
     version: 3,
-    file: basename(filename).replace(/\.pjs$/, '.js'),
+    file: basename(filename).replace(/\.esm$/, '.js'),
     sources: [filename],
     sourcesContent: [originalCode],
     names: [],
