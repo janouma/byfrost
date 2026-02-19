@@ -2,6 +2,7 @@ import { existsSync } from 'fs'
 import { dirname, basename } from 'path'
 
 const CUSTOM_ELEMENT_NAME_PATTERN = /^[a-zA-Z0-9]+(_[a-zA-Z0-9]+)+$/
+const DEFAULT_EXPORT_CLASS_PATTERN = /(^|\s+)export\s+default\s+(class\s+)?(?<componentClassName>\w+)(\s+|$)/
 
 export default async function compileComponent (
   {
@@ -14,6 +15,12 @@ export default async function compileComponent (
 ) {
   if (typeof code !== 'string') {
     throw new Error('code must be provided')
+  }
+
+  const componentClassName = code.match(DEFAULT_EXPORT_CLASS_PATTERN)?.groups?.componentClassName
+
+  if (!componentClassName) {
+    throw new Error('Plain JS component must have the component class name as a default export (`export default class ComponentClassName ...` or `export default ComponentClassName`)')
   }
 
   if (typeof scriptPreprocessor !== 'function') {
@@ -54,11 +61,14 @@ export default async function compileComponent (
 
   const { code: compiledCode } = await scriptPreprocessor({ content: code })
 
+  const tag = folderBasename.replaceAll('_', '-').toLowerCase()
+  const finalCode = `${compiledCode}\n\ncustomElements.define('${tag}', ${componentClassName})`
+
   const shouldGenerateSourcemap = enableSourcemap === true || enableSourcemap?.js || false
 
   return {
-    code: compiledCode,
-    map: shouldGenerateSourcemap ? generateSourcemap(filename, code, compiledCode) : undefined
+    code: finalCode,
+    map: shouldGenerateSourcemap ? generateSourcemap(filename, code, finalCode) : undefined
   }
 }
 

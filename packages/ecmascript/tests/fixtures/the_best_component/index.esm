@@ -24,5 +24,3 @@ export default class TheBestComponent extends HTMLElement {
     `
   }
 }
-
-customElements.define('the-best-component', TheBestComponent)

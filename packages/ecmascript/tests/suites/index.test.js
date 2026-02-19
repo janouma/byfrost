@@ -23,6 +23,10 @@ test('should validate parameters', async ({ expect }) => {
   await expect(() => compile()).rejects.toThrow('code must be provided')
   await expect(() => compile({ code: 1 })).rejects.toThrow('code must be provided')
 
+  await expect(() => compile({ code: 'const foo = "bar"' })).rejects.toThrow(
+    'Plain JS component must have the component class name as a default export (`export default class ComponentClassName ...` or `export default ComponentClassName`)'
+  )
+
   await expect(() => compile({ code })).rejects
     .toThrow('scriptPreprocessor must be a function')
 
