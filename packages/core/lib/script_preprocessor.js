@@ -127,7 +127,10 @@ export default curry(async (
   }
 
   const assetImports = extractDependencies(transformedCode).filter(({ type }) => type === ASSET_TYPE)
-  const componentRelativePath = prefix ? join(prefix, hostComponentName) : hostComponentName
+
+  const componentRelativePath = prefix
+    ? `${prefix}/${hostComponentName}`.replaceAll(/(?<!^)\/{2,}/g, '/')
+    : hostComponentName
 
   {
     const splice = createOffsettedSplice()

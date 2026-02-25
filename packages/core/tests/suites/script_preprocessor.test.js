@@ -167,5 +167,20 @@ test.group('script_preprocessor', group => {
       const { code: transformedCode } = await preprocess({ content: code })
       expect(transformedCode).toBe("const icon = 'prefix/the_root_component/assets/images/icon.svg'")
     }
+
+    {
+      const preprocess = createScriptPreprocessor({
+        source,
+        destination,
+        moduleResolutionPaths,
+        config: { srcTypesCompilerMapping: { svelte: '@byfrost/svelte' } },
+        prefix: '//origin:port//path/to///resource/',
+        cache: new Map()
+      })
+
+      const code = "import icon from './assets/images/icon.svg'"
+      const { code: transformedCode } = await preprocess({ content: code })
+      expect(transformedCode).toBe("const icon = '//origin:port/path/to/resource/the_root_component/assets/images/icon.svg'")
+    }
   })
 })
