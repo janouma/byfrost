@@ -109,6 +109,7 @@ test.group('#rewriteModulesImports', group => {
     import logger from '@byfrost/utils/logger.js'
     import { curry } from '@byfrost/utils/function.js'
     import util from 'lib/utils.js'
+    import api from 'services/api.js'
 
     import {
       process,
@@ -150,6 +151,11 @@ test.group('#rewriteModulesImports', group => {
       '/^lib/(.+)$/': {
         alias: '../output/lib/$1',
         copyModule: false
+      },
+
+      '/^services/(.+)$/': {
+        alias: './services/$1',
+        destination: '../output/_services/$1'
       }
     }
 
@@ -174,6 +180,7 @@ test.group('#rewriteModulesImports', group => {
     import logger from '../packages/@byfrost/utils/common/logger.js'
     import { curry } from '../packages/@byfrost/utils/common/function.js'
     import util from '../lib/utils.js'
+    import api from '../_services/api.js'
 
     import {
       process,
@@ -246,6 +253,13 @@ test.group('#rewriteModulesImports', group => {
       const content = String(readFileSync(dependency))
       expect(matches.every(match => content.match(match))).toBe(true)
     }
+
+    const builtApiPath = resolve(`${configWorkingDirectory}/../output/_services/api.js`)
+    const builtApi = String(readFileSync(builtApiPath))
+
+    expect(builtApi).toBe(`import logger from '../packages/@byfrost/utils/common/logger.js'
+export default function api () { }
+`)
   })
 
   test('should not try module resolving indefinitely', ({ expect }) => {

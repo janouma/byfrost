@@ -33,7 +33,19 @@ test.group('script_preprocessor', group => {
       source,
       destination,
       moduleResolutionPaths,
-      config: { srcTypesCompilerMapping: { svelte: '@byfrost/svelte' } },
+      configWorkingDirectory: dirname(require.resolve('../fixtures/custom.config.js')),
+
+      config: {
+        srcTypesCompilerMapping: { svelte: '@byfrost/svelte' },
+
+        modulesMapping: {
+          '/^lib/(.+)$/': {
+            alias: '../output/lib/$1',
+            copyModule: false
+          }
+        }
+      },
+
       cache: new Map()
     })
 
@@ -66,18 +78,20 @@ test.group('script_preprocessor', group => {
     const plainJsDependencies = [
       { src: '../common_fixture.js', copy: '--/common_fixture.js' },
       { src: '../common_fixture_bis.js', copy: '--/common_fixture_bis.js' },
-      'the_main_component/helpers/config.js',
       'the_main_component/helpers/update.js',
+
+      {
+        src: 'the_main_component/helpers/config.js',
+        transform: content => content.replace("'lib/utils.js'", "'../lib/utils.js'")
+      },
 
       {
         src: 'the_main_component/helpers/util/index.js',
 
-        transform (content) {
-          return content.replace(
-            "'../../../../common_fixture_bis.js'",
-            "'../../../--/common_fixture_bis.js'"
-          )
-        }
+        transform: content => content.replace(
+          "'../../../../common_fixture_bis.js'",
+          "'../../../--/common_fixture_bis.js'"
+        )
       }
     ]
 

@@ -56,7 +56,22 @@ export default curry(async (
       const depFinalDestPath = join(destination, depRelativeDestPath)
         .replace(/\.js$/, '') + '.js'
 
-      copyWithDependencies({ src: dependencySourcePath, copy: depFinalDestPath, base: destination })
+      copyWithDependencies({
+        src: dependencySourcePath,
+        copy: depFinalDestPath,
+        base: destination,
+        ...(config && {
+          rewriteParameters: {
+            modulesMapping: config.modulesMapping || {},
+            copyModules: Boolean(config.copyModules),
+            configWorkingDirectory,
+            source,
+            sourceTypes,
+            destination,
+            moduleResolutionPaths
+          }
+        })
+      })
 
       const updatedImportPath = relativize(hostComponentDestFolder, depFinalDestPath)
       const leadingDot = updatedImportPath.startsWith('.') ? '' : './'

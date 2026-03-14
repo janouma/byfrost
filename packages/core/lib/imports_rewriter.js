@@ -18,10 +18,15 @@ const require = createRequire(import.meta.url)
 const log = logger.getLogger('core/imports_rewriter')
 const cache = new Map()
 
-export function rewriteModulesImports ({
-  code, modulesMapping, copyModules: copyAllModules, source, sourceTypes, destination, moduleResolutionPaths,
-  configWorkingDirectory, resolveModule = require.resolve
-}) {
+export function rewriteModulesImports ({ code, ...rewriteParameters }) {
+  const {
+    modulesMapping, copyModules: copyAllModules, source, sourceTypes, destination, moduleResolutionPaths,
+    configWorkingDirectory, resolveModule = require.resolve,
+    withMappingResults = false
+  } = rewriteParameters
+
+  let mappingResults
+
   const splice = createOffsettedSplice()
   const imports = extractDependencies(code, { sourceTypes })
 
@@ -35,10 +40,12 @@ export function rewriteModulesImports ({
 
   let transformedCode = code
 
-  log.debug({
-    configWorkingDirectory,
-    componentDestFolder: resolvePath(componentDestFolder)
-  })
+  if (log.logLevel === 'debug') {
+    log.debug({
+      configWorkingDirectory,
+      componentDestFolder: resolvePath(componentDestFolder)
+    })
+  }
 
   for (const { target: srcTarget, type, targetBounds: { start, end } } of imports) {
     const matches = parsedModuleMapping
@@ -56,6 +63,11 @@ export function rewriteModulesImports ({
       log.debug(
         { alias, configAlias, moduleDestination, moduleDestAbsolutePath, copyModule, copyAllModules }
       )
+
+      if (withMappingResults) {
+        mappingResults ??= new Set()
+        mappingResults.add(moduleDestination)
+      }
 
       const componentMark = type === COMPONENT_TYPE &&
         !sourceTypes.some(sourceType => moduleDestination.endsWith('.' + sourceType))
@@ -79,12 +91,17 @@ export function rewriteModulesImports ({
         )
 
         log.debug('aliasSrcPath:', aliasSrcPath)
-        copyWithDependencies({ src: aliasSrcPath, copy: moduleDestAbsolutePath })
+
+        copyWithDependencies({
+          src: aliasSrcPath,
+          copy: moduleDestAbsolutePath,
+          rewriteParameters
+        })
       }
     }
   }
 
-  return transformedCode
+  return withMappingResults ? { code: transformedCode, mappingResults } : transformedCode
 }
 
 function parseConfig ({
@@ -194,7 +211,7 @@ function tryResolvingModule (resolve, target, ...options) {
   return targetSrcPath
 }
 
-export function copyWithDependencies ({ src: source, copy: destination, base = dirname(destination) }) {
+export function copyWithDependencies ({ src: source, copy: destination, base = dirname(destination), rewriteParameters }) {
   log.debug('copyWithDependencies:', { source, destination })
 
   const sourceCache = cache.get(source)
@@ -209,28 +226,31 @@ export function copyWithDependencies ({ src: source, copy: destination, base = d
     }
   }
 
-  const code = readFileSync(source)
-  let transformedCode = code
+  const code = String(readFileSync(source))
 
-  const dependencies = extractDependencies(
-    String(code), { includeExports: true }
-  )
+  let { code: transformedCode, mappingResults } = rewriteParameters
+    ? rewriteModulesImports({
+      code,
+      ...rewriteParameters,
+      withMappingResults: true
+    })
+    : code
+
+  const dependencies = extractDependencies(transformedCode, { includeExports: true })
 
   const jsDependencies = dependencies.filter(
     ({ target, type }) =>
+      !mappingResults?.has(target) &&
       (target.startsWith('./') || target.startsWith('../')) &&
       type === PLAIN_JS_TYPE
   )
 
-  if (log.logLevel === 'debug') {
-    log.debug('copyWithDependencies:', { dependencies, jsDependencies })
-  }
+  log.debug('copyWithDependencies:', { dependencies, jsDependencies })
 
   const splice = createOffsettedSplice()
 
   for (const { target, targetBounds: { start, end } } of jsDependencies) {
     const targetAbsolutePath = resolvePath(dirname(source), target)
-
     const targetOriginalDestPath = resolvePath(dirname(destination), target)
     const targetRelativeDestPath = relativize(base, targetOriginalDestPath)
     const targetDestinationPath = `${base}/${targetRelativeDestPath}`.replaceAll('../', '--/')
@@ -245,7 +265,13 @@ export function copyWithDependencies ({ src: source, copy: destination, base = d
     }
 
     transformedCode = splice(transformedCode, `'${containedTarget}'`, start, end)
-    copyWithDependencies({ src: targetAbsolutePath, copy: targetDestinationPath, base })
+
+    copyWithDependencies({
+      src: targetAbsolutePath,
+      copy: targetDestinationPath,
+      base,
+      rewriteParameters
+    })
   }
 
   const destinationFolder = dirname(destination)
