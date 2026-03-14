@@ -257,7 +257,7 @@ test.group('#rewriteModulesImports', group => {
     const builtApiPath = resolve(`${configWorkingDirectory}/../output/_services/api.js`)
     const builtApi = String(readFileSync(builtApiPath))
 
-    expect(builtApi).toBe(`import logger from '../packages/@byfrost/utils/common/logger.js'
+    expect(builtApi).toBe(`import logger from '../../packages/@byfrost/utils/common/logger.js'
 export default function api () { }
 `)
   })

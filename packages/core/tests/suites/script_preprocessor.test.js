@@ -82,7 +82,7 @@ test.group('script_preprocessor', group => {
 
       {
         src: 'the_main_component/helpers/config.js',
-        transform: content => content.replace("'lib/utils.js'", "'../lib/utils.js'")
+        transform: content => content.replace("'lib/utils.js'", "'../../../lib/utils.js'")
       },
 
       {

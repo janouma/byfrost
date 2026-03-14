@@ -232,6 +232,8 @@ export function copyWithDependencies ({ src: source, copy: destination, base = d
     ? rewriteModulesImports({
       code,
       ...rewriteParameters,
+      source: dirname(source),
+      destination: dirname(destination),
       withMappingResults: true
     })
     : code
