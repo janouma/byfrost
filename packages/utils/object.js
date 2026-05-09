@@ -1,7 +1,3 @@
-const clone = typeof structuredClone === 'function'
-  ? structuredClone
-  : source => JSON.parse(JSON.stringify(source))
-
 export function merge (...sources) {
   return mergeWith((destValue, srcValue) => {
     if (Array.isArray(destValue) && Array.isArray(srcValue)) {
@@ -14,6 +10,15 @@ export function merge (...sources) {
 
 export function shallowMerge (...sources) {
   return Object.assign({}, ...sources)
+}
+
+export function clone (value) {
+  try {
+    return structuredClone(value)
+  } catch (error) {
+    const serializedValue = JSON.stringify(value)
+    return serializedValue && JSON.parse(serializedValue)
+  }
 }
 
 function mergeWith (mergeFn, ...sources) {

@@ -1,5 +1,57 @@
 import { test } from '@japa/runner'
-import { merge, shallowMerge } from '../../object.js'
+import { merge, shallowMerge, clone } from '../../object.js'
+
+test.group('#clone', () => {
+  test('should clone value', ({ expect }) => {
+    const input = { a: 1, b: { c: 2 } }
+    const result = clone(input)
+    expect(result).toStrictEqual(input)
+    expect(result).not.toBe(input)
+  })
+
+  test('should handle missing structuredClone', ({ expect }) => {
+    const nativeStructuredClone = structuredClone
+
+    try {
+      delete global.structuredClone
+
+      const input = { a: 1, b: { c: 2 } }
+      const result = clone(input)
+
+      expect(result).toStrictEqual(input)
+      expect(result).not.toBe(input)
+    } finally {
+      global.structuredClone = nativeStructuredClone
+    }
+  })
+
+  test('should not throw when cloning undefined without structuredClone', ({ expect }) => {
+    const nativeStructuredClone = structuredClone
+
+    try {
+      delete global.structuredClone
+      expect(clone(undefined)).toBeUndefined()
+    } finally {
+      global.structuredClone = nativeStructuredClone
+    }
+  })
+
+  test('should handle structuredClone exceptions', ({ expect }) => {
+    const nativeStructuredClone = structuredClone
+
+    try {
+      global.structuredClone = () => { throw new Error('structuredClone Error') }
+
+      const input = { a: 1, b: { c: 2 } }
+      const result = clone(input)
+
+      expect(result).toStrictEqual(input)
+      expect(result).not.toBe(input)
+    } finally {
+      global.structuredClone = nativeStructuredClone
+    }
+  })
+})
 
 test.group('#shallowMerge', () => {
   test('should merge several sources shallowly into a new object', ({ expect }) => {
