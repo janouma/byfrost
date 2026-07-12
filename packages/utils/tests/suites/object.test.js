@@ -3,7 +3,7 @@ import { merge, shallowMerge, clone } from '../../object.js'
 
 test.group('#clone', () => {
   test('should clone value', ({ expect }) => {
-    const input = { a: 1, b: { c: 2 } }
+    const input = { a: 1, b: { c: 2 }, d: undefined }
     const result = clone(input)
     expect(result).toStrictEqual(input)
     expect(result).not.toBe(input)
@@ -16,7 +16,7 @@ test.group('#clone', () => {
       delete global.structuredClone
 
       const input = { a: 1, b: { c: 2 } }
-      const result = clone(input)
+      const result = clone({ ...input, d: undefined })
 
       expect(result).toStrictEqual(input)
       expect(result).not.toBe(input)
@@ -43,7 +43,7 @@ test.group('#clone', () => {
       global.structuredClone = () => { throw new Error('structuredClone Error') }
 
       const input = { a: 1, b: { c: 2 } }
-      const result = clone(input)
+      const result = clone({ ...input, d: undefined })
 
       expect(result).toStrictEqual(input)
       expect(result).not.toBe(input)
