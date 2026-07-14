@@ -213,7 +213,7 @@ ${log}
 Object manipulation utilities with deep merging capabilities.
 
 ```js
-import { merge, shallowMerged } from '@byfrost/utils/object.js'
+import { merge, shallowMerged, clone } from '@byfrost/utils/object.js'
 
 // Deep merge objects (clone all objects/arrays)
 const merged = merge(
@@ -232,6 +232,13 @@ const withArrays = merge(
 // Shallow merge (nested objects/arrays are not cloned)
 const shallowMerged = shallowMerge({ a: 1 }, { b: 2 })
 // Result: { a: 1, b: 2 }
+
+// Deep clone of an object
+const source = { a: 1, b: { c: 2 } }
+const copy = clone(source)
+// Result:
+// copy !== source
+// copy.b !== source.b
 ```
 
 ### Run

@@ -96,6 +96,7 @@ export default {
     // Default values
     // svelte: '@byfrost/svelte',
     // vue: '@byfrost/vue',
+    // esm: '@byfrost/ecmascript',
 
     // If one wants to add react support (module not provided)
     react: <react to custom element compiler name or path>
