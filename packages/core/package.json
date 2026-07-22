@@ -1,6 +1,6 @@
 {
   "name": "@byfrost/core",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "web components micro builder",
   "main": "bin/index.js",
   "keywords": [

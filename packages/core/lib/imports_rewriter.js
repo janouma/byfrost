@@ -22,6 +22,7 @@ export function rewriteModulesImports ({ code, ...rewriteParameters }) {
   const {
     modulesMapping, copyModules: copyAllModules, source, sourceTypes, destination, moduleResolutionPaths,
     configWorkingDirectory, resolveModule = require.resolve,
+    componentDestFolder: componentDestFolderOverride,
     withMappingResults = false
   } = rewriteParameters
 
@@ -36,7 +37,7 @@ export function rewriteModulesImports ({ code, ...rewriteParameters }) {
       : [target, config]
   )
 
-  const componentDestFolder = join(destination, basename(source))
+  const componentDestFolder = componentDestFolderOverride ?? join(destination, basename(source))
 
   let transformedCode = code
 
@@ -232,11 +233,10 @@ export function copyWithDependencies ({ src: source, copy: destination, base = d
     ? rewriteModulesImports({
       code,
       ...rewriteParameters,
-      source: dirname(source),
-      destination: dirname(destination),
+      componentDestFolder: dirname(destination),
       withMappingResults: true
     })
-    : code
+    : { code }
 
   const dependencies = extractDependencies(transformedCode, { includeExports: true })
 
